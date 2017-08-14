@@ -27,6 +27,7 @@
 #define RGB_Alpha(r, g, b, alp) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: alp]
 #define RGB(r, g, b) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: 1]
 
+
 @interface APLAccelerometerGraphViewController03 ()
 
 @property (strong,nonatomic) BufferRecords *bufferRecord;
