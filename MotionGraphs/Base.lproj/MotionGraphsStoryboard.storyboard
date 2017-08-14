@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="3vD-DM-kBQ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="3vD-DM-kBQ">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,7 +29,7 @@
                                         <rect key="frame" x="0.0" y="22" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DMs-Eo-COT" id="3hC-Hc-9uv">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -88,7 +88,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="V6m-xJ-4hP" id="j23-4t-ijj">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -135,7 +135,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="N2h-7r-sQw" id="jTw-ND-9bq">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -182,7 +182,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="BlW-Po-Ziz" id="khE-D4-bdn">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -399,7 +399,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
                     <navigationItem key="navigationItem" id="zYD-Rr-FqH">
-                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="action" id="6B9-Lg-wGt"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="6B9-Lg-wGt"/>
                     </navigationItem>
                     <connections>
                         <outlet property="actualSamplingRateLabel" destination="RdW-4v-F57" id="5Qt-pz-qk0"/>
@@ -874,7 +874,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="P9j-Wg-Vh4" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="monitor" image="monitor" id="2aL-vU-8KZ"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="y6r-RD-Ujh">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="y6r-RD-Ujh">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">
@@ -897,7 +897,7 @@
                     <tabBarItem key="tabBarItem" title="SandBox" image="sandbox" id="5xI-28-itT"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="sVO-cq-I3R"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="i55-oL-Ebo">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="i55-oL-Ebo">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">
@@ -920,7 +920,7 @@
                     <tabBarItem key="tabBarItem" title="Cloud" image="dropbox" id="8HE-5N-fIO"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="60d-1q-Wxf"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="NFa-yn-Dow">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="NFa-yn-Dow">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">
@@ -942,7 +942,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0gy-lv-6DB" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Record Settings" image="option" id="s0G-kj-wM0"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="JsN-WC-8zY">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="JsN-WC-8zY">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">
@@ -961,7 +961,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="Wiw-zP-UNq">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="3vD-DM-kBQ" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="APLAccelerometerGraphViewController03" automaticallyAdjustsScrollViewInsets="NO" id="3vD-DM-kBQ" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="Yux-iV-2BN">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -1001,7 +1001,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nGW-zg-gAe" id="nNt-FG-aJI">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -1048,7 +1048,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="FLm-In-p6j" id="tKU-WX-CUN">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
@@ -1095,7 +1095,7 @@
                                         <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="PBL-JR-N4O" id="FGk-PC-htx">
-                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.666666666666664"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="381" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                         <connections>
