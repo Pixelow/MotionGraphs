@@ -1,0 +1,51 @@
+/* 
+  Localizable.strings
+*/
+
+"graphSegmentFormat" = "%1.2f, %1.2f, %1.2f"; // Format string for accessibility text for last x, y, z values added.
+
+"Monitor" = "监测";
+"Local Control" = "本体控制";
+"Group Control" = "同步控制";
+"Remote Sync" = "远程同步";
+"Monitor will be automatically remoted to other devices." = "监测将自动与其他设备同步";
+"Status Of Record" = "等待记录";
+"Started Recording at:" = "开始记录：";
+"Stopped Recording at:" = "终止记录：";
+"Buffer" = "开始预警";
+"Start Buffer" = "开始预警";
+"Stop Buffer" = "终止预警";
+"Buffering" = "预警中";
+"Record" = "开始记录";
+"Start Record" = "开始记录";
+"Stop Record" = "终止记录";
+"Recording" = "记录中";
+"Remote Buffer" = "远程预警";
+"Remote Record" = "远程记录";
+
+"SandBox" = "本地";
+"longitude" = "经度";
+"latitude" = "纬度";
+"Actual Sampling Rate" = "实际采样频率";
+"Frequency (Hz)" = "频率 (Hz)";
+"Amplitude (gal/Hz)" = "振幅 (gal/Hz)";
+"Time (secs)" = "时间 (secs)";
+"acc (gal)" = "加速度 (gal)";
+"angle (degrees)" = "角度 (degrees)";
+"X Direction" = "X 向量";
+"Y Direction" = "Y 向量";
+"Z Direction" = "Z 向量";
+
+"Cloud" = "云端";
+"Cloud Settings" = "设置";
+
+"Triggered Data" = "触发数据";
+"Recorded Data" = "记录数据";
+"Status Info" = "状态信息";
+"Supporting Files" = "支持文件";
+
+"Force Remote Stop Info" = "远程强行终止";
+"Force Remote Start Info" = "远程强行开始";
+"Triggered Info" = "触发信息";
+"Remote Stop Info" = "远程终止记录";
+"Remote Start Info" = "远程开始记录";

@@ -1,0 +1,138 @@
+
+/* Class = "UILabel"; text = "Sampling Rate"; ObjectID = "0yn-RY-dJX"; */
+"0yn-RY-dJX.text" = "サンプリング頻度";
+
+/* Class = "UITabBarItem"; title = "monitor"; ObjectID = "2aL-vU-8KZ"; */
+"2aL-vU-8KZ.title" = "測定";
+
+/* Class = "UILabel"; text = "interval"; ObjectID = "4Vh-OQ-sT5"; */
+"4Vh-OQ-sT5.text" = "interval";
+
+/* Class = "UIButton"; normalTitle = "Start Buffer"; ObjectID = "5ox-jj-qVG"; */
+"5ox-jj-qVG.normalTitle" = "早期警戒スタート";
+
+/* Class = "UITabBarItem"; title = "SandBox"; ObjectID = "5xI-28-itT"; */
+"5xI-28-itT.title" = "ローカル";
+
+/* Class = "UILabel"; text = "0 secs"; ObjectID = "6Cx-h8-QXj"; */
+"6Cx-h8-QXj.text" = "0 secs";
+
+/* Class = "UIButton"; normalTitle = "Empty SandBox"; ObjectID = "6Id-Zh-nTq"; */
+"6Id-Zh-nTq.normalTitle" = "クリアファイル";
+
+/* Class = "UILabel"; text = "Monitor will be automatically remoted to other devices."; ObjectID = "8BG-XD-dyu"; */
+"8BG-XD-dyu.text" = "他のデバイスも同時にトリガーされます。";
+
+/* Class = "UITabBarItem"; title = "iCloud"; ObjectID = "8HE-5N-fIO"; */
+"8HE-5N-fIO.title" = "クラウド";
+
+/* Class = "UILabel"; text = "Device"; ObjectID = "A8n-0H-yab"; */
+"A8n-0H-yab.text" = "装置";
+
+/* Class = "UIButton"; normalTitle = "UPDATE"; ObjectID = "DOm-oD-aFY"; */
+"DOm-oD-aFY.normalTitle" = "更新";
+
+/* Class = "UILabel"; text = "Rate"; ObjectID = "DuB-7O-gPu"; */
+"DuB-7O-gPu.text" = "週波数";
+
+/* Class = "UILabel"; text = "2017.05.23"; ObjectID = "EjB-16-oIK"; */
+"EjB-16-oIK.text" = "2017.05.23";
+
+/* Class = "UILabel"; text = "Device"; ObjectID = "FCv-1C-w0E"; */
+"FCv-1C-w0E.text" = "装置";
+
+/* Class = "UILabel"; text = "M"; ObjectID = "KGb-8k-tHH"; */
+"KGb-8k-tHH.text" = "M";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "KyW-mg-rYu"; */
+"KyW-mg-rYu.text" = "Label";
+
+/* Class = "UIButton"; normalTitle = "Start Record"; ObjectID = "MQi-Ua-c9x"; */
+"MQi-Ua-c9x.normalTitle" = "記録開始";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "NTW-35-AJv"; */
+"NTW-35-AJv.text" = "Label";
+
+/* Class = "UILabel"; text = "Buffer Length"; ObjectID = "Nhp-NW-M9m"; */
+"Nhp-NW-M9m.text" = "早期警戒時間";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "RdW-4v-F57"; */
+"RdW-4v-F57.text" = "Label";
+
+/* Class = "UILabel"; text = "Record Length"; ObjectID = "Rid-sz-AcR"; */
+"Rid-sz-AcR.text" = "記録時間";
+
+/* Class = "UILabel"; text = "Buffer"; ObjectID = "RuT-zY-hjK"; */
+"RuT-zY-hjK.text" = "早期警戒時間";
+
+/* Class = "UITextView"; text = "Status Of Record"; ObjectID = "Tlc-5W-FtB"; */
+"Tlc-5W-FtB.text" = "記録状態";
+
+/* Class = "UILabel"; text = "2017.05.23"; ObjectID = "Uph-BJ-DhS"; */
+"Uph-BJ-DhS.text" = "2017.05.23";
+
+/* Class = "UILabel"; text = "0 Gal"; ObjectID = "V0c-t4-VZu"; */
+"V0c-t4-VZu.text" = "0 Gal";
+
+/* Class = "UILabel"; text = "PGA Value"; ObjectID = "WvH-7h-6HJ"; */
+"WvH-7h-6HJ.text" = "PGA値";
+
+/* Class = "UILabel"; text = "accelerometerData.acceleration"; ObjectID = "YHj-rC-6bQ"; */
+"YHj-rC-6bQ.text" = "accelerometerData.acceleration";
+
+/* Class = "UILabel"; text = "Period"; ObjectID = "ZPs-HW-pw0"; */
+"ZPs-HW-pw0.text" = "期間";
+
+/* Class = "UIButton"; normalTitle = "Force Remote Start"; ObjectID = "bXj-To-X4L"; */
+"bXj-To-X4L.normalTitle" = "遠隔記録";
+
+/* Class = "UIButton"; normalTitle = "Remote Start"; ObjectID = "bav-5U-1LR"; */
+"bav-5U-1LR.normalTitle" = "遠隔早期警戒";
+
+/* Class = "UILabel"; text = "s"; ObjectID = "ctj-7N-Jmc"; */
+"ctj-7N-Jmc.text" = "s";
+
+/* Class = "UILabel"; text = "0 secs"; ObjectID = "ebm-Mq-YT6"; */
+"ebm-Mq-YT6.text" = "0 secs";
+
+/* Class = "UILabel"; text = "192.000"; ObjectID = "fIf-pA-QqC"; */
+"fIf-pA-QqC.text" = "192.000";
+
+/* Class = "UILabel"; text = "Trigger Threshold"; ObjectID = "fR3-VO-eUM"; */
+"fR3-VO-eUM.text" = "トリガー閾値";
+
+/* Class = "UILabel"; text = "Device"; ObjectID = "fjw-nr-gRm"; */
+"fjw-nr-gRm.text" = "装置";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "hPM-2w-ODR"; */
+"hPM-2w-ODR.title" = "Item";
+
+/* Class = "UILabel"; text = "ΔT="; ObjectID = "hz0-Lo-djd"; */
+"hz0-Lo-djd.text" = "ΔT=";
+
+/* Class = "UILabel"; text = "M"; ObjectID = "iUp-H0-OJZ"; */
+"iUp-H0-OJZ.text" = "M";
+
+/* Class = "UILabel"; text = "Date"; ObjectID = "iVg-Ch-MGE"; */
+"iVg-Ch-MGE.text" = "日付";
+
+/* Class = "UILabel"; text = "Local Control"; ObjectID = "mYl-TX-FbD"; */
+"mYl-TX-FbD.text" = "本体制御";
+
+/* Class = "UILabel"; text = "192.000"; ObjectID = "nLC-Z4-7Iq"; */
+"nLC-Z4-7Iq.text" = "192.000";
+
+/* Class = "UILabel"; text = "0 Hz"; ObjectID = "nXt-qS-vmg"; */
+"nXt-qS-vmg.text" = "0 Hz";
+
+/* Class = "UILabel"; text = "Remote Sync"; ObjectID = "qJU-mA-o6P"; */
+"qJU-mA-o6P.text" = "遠隔同期";
+
+/* Class = "UILabel"; text = "Record"; ObjectID = "qNH-8q-stR"; */
+"qNH-8q-stR.text" = "記録時間";
+
+/* Class = "UITabBarItem"; title = "Record Settings"; ObjectID = "s0G-kj-wM0"; */
+"s0G-kj-wM0.title" = "設置";
+
+/* Class = "UILabel"; text = "Threshold"; ObjectID = "xKb-h3-cQw"; */
+"xKb-h3-cQw.text" = "トリガー閾値";

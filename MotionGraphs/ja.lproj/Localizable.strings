@@ -1,0 +1,51 @@
+/* 
+  Localizable.strings
+*/
+
+"graphSegmentFormat" = "%1.2f, %1.2f, %1.2f"; // Format string for accessibility text for last x, y, z values added.
+
+"Monitor" = "測定";
+"Local Control" = "本体制御";
+"Group Control" = "同期制御";
+"Remote Sync" = "遠隔同期";
+"Monitor will be automatically remoted to other devices." = "他のデバイスも同時にトリガーされます。";
+"Status Of Record" = "待機中";
+"Started Recording at:" = "スタートを開始：";
+"Stopped Recording at:" = "終止レコード：";
+"Buffer" = "早期警戒スタート";
+"Start Buffer" = "早期警戒スタート";
+"Stop Buffer" = "早期警戒を停止";
+"Buffering" = "早期警戒";
+"Record" = "記録開始";
+"Start Record" = "記録開始";
+"Stop Record" = "停止記録";
+"Recording" = "記録";
+"Remote Buffer" = "遠隔早期警戒";
+"Remote Record" = "遠隔記録";
+
+"SandBox" = "ローカル";
+"longitude" = "経度";
+"latitude" = "緯度";
+"Actual Sampling Rate" = "実サンプリング頻度";
+"Frequency (Hz)" = "週波数 (Hz)";
+"Amplitude (gal/Hz)" = "振幅 (gal/Hz)";
+"Time (secs)" = "時間 (secs)";
+"acc (gal)" = "加速度 (gal)";
+"angle (degrees)" = "角度 (degrees)";
+"X Direction" = "X 方向";
+"Y Direction" = "Y 方向";
+"Z Direction" = "Z 方向";
+
+"Cloud" = "クラウド";
+"Cloud Settings" = "設置";
+
+"Triggered Data" = "トリガーによる記録";
+"Recorded Data" = "記録データ";
+"Status Info" = "ステータス情報";
+"Supporting Files" = "サポートファイル";
+
+"Force Remote Stop Info" = "遠隔強制終瞭";
+"Force Remote Start Info" = "遠隔強制開始";
+"Triggered Info" = "トリガ情報";
+"Remote Stop Info" = "遠隔停止記録";
+"Remote Start Info" = "遠隔開始記録";
