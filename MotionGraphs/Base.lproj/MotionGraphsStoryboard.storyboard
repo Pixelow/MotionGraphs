@@ -13,8 +13,8 @@
             <objects>
                 <viewController id="Axw-UE-Ki2" customClass="AppSandboxViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="hTz-n3-Xw5"/>
-                        <viewControllerLayoutGuide type="bottom" id="H2T-P2-0Vw"/>
+                        <viewControllerLayoutGuide type="top" id="1xD-ic-ggE"/>
+                        <viewControllerLayoutGuide type="bottom" id="E31-yt-LCE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Gc8-q9-9Mm">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -67,8 +67,8 @@
             <objects>
                 <viewController id="SoB-Kq-Wch" customClass="DropboxViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="wUc-Rd-M4k"/>
-                        <viewControllerLayoutGuide type="bottom" id="ckQ-ag-aGZ"/>
+                        <viewControllerLayoutGuide type="top" id="4YW-BB-Dmv"/>
+                        <viewControllerLayoutGuide type="bottom" id="efm-dR-LmD"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="RA0-CZ-8SM">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -109,8 +109,8 @@
             <objects>
                 <viewController id="2FN-dg-cH2" customClass="DropboxDeviceListViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="cEc-xd-vxB"/>
-                        <viewControllerLayoutGuide type="bottom" id="3rd-Be-lCM"/>
+                        <viewControllerLayoutGuide type="top" id="WCa-FG-c6v"/>
+                        <viewControllerLayoutGuide type="bottom" id="BEo-JO-dzd"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="hyU-Im-OOC">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -151,8 +151,8 @@
             <objects>
                 <viewController id="f30-Cc-nAV" customClass="DropboxDeviceRecordDataViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="j4r-B2-KGZ"/>
-                        <viewControllerLayoutGuide type="bottom" id="zRy-yr-0kc"/>
+                        <viewControllerLayoutGuide type="top" id="Qmc-5e-wt8"/>
+                        <viewControllerLayoutGuide type="bottom" id="KE8-iU-Keo"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="RSI-Yv-KqQ">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -193,8 +193,8 @@
             <objects>
                 <viewController id="ScJ-GV-g6b" customClass="SandboxDetailViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="NEN-e4-EEH"/>
-                        <viewControllerLayoutGuide type="bottom" id="7Le-M9-Ud1"/>
+                        <viewControllerLayoutGuide type="top" id="ffH-8Y-Gy3"/>
+                        <viewControllerLayoutGuide type="bottom" id="y59-Zh-doH"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ss0-AZ-liu">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -387,8 +387,8 @@
             <objects>
                 <viewController id="udV-fK-Hov" customClass="RecordSettingViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="ecE-H1-1l8"/>
-                        <viewControllerLayoutGuide type="bottom" id="uBE-FH-1gc"/>
+                        <viewControllerLayoutGuide type="top" id="KuQ-gM-cfU"/>
+                        <viewControllerLayoutGuide type="bottom" id="icI-bM-HSH"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="QwR-mj-dck">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -549,8 +549,8 @@
             <objects>
                 <viewController id="P1M-ty-VNJ" customClass="APLAccelerometerGraphViewController03" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="kQx-9b-FDa"/>
-                        <viewControllerLayoutGuide type="bottom" id="HME-1t-7uq"/>
+                        <viewControllerLayoutGuide type="top" id="hgd-5f-J2g"/>
+                        <viewControllerLayoutGuide type="bottom" id="7bA-NG-cpe"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" id="cih-3x-kgm">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -777,6 +777,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="P9j-Wg-Vh4" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="monitor" image="monitor" id="2aL-vU-8KZ"/>
                     <toolbarItems/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="y6r-RD-Ujh">
@@ -802,6 +803,7 @@
                     <tabBarItem key="tabBarItem" title="SandBox" image="sandbox" id="5xI-28-itT"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="sVO-cq-I3R"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="i55-oL-Ebo">
@@ -827,6 +829,7 @@
                     <tabBarItem key="tabBarItem" title="Cloud" image="dropbox" id="8HE-5N-fIO"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="60d-1q-Wxf"/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="NFa-yn-Dow">
@@ -851,6 +854,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0gy-lv-6DB" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Record Settings" image="option" id="s0G-kj-wM0"/>
                     <toolbarItems/>
+                    <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" id="JsN-WC-8zY">
@@ -874,8 +878,6 @@
             <objects>
                 <tabBarController storyboardIdentifier="APLAccelerometerGraphViewController03" automaticallyAdjustsScrollViewInsets="NO" id="3vD-DM-kBQ" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="414" height="736"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="Yux-iV-2BN">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -899,8 +901,8 @@
             <objects>
                 <viewController id="dYM-0u-Vsf" customClass="DropboxDeviceRecordDataMonthViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="zsK-yT-GWP"/>
-                        <viewControllerLayoutGuide type="bottom" id="NIO-hv-QtZ"/>
+                        <viewControllerLayoutGuide type="top" id="lfa-We-8Rt"/>
+                        <viewControllerLayoutGuide type="bottom" id="wQ9-9L-rHG"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ElP-HG-cmm">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -941,8 +943,8 @@
             <objects>
                 <viewController id="4J8-St-cqT" customClass="DropboxDeviceRecordDataYearViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="DP0-Nt-V1Y"/>
-                        <viewControllerLayoutGuide type="bottom" id="WL7-W3-NEK"/>
+                        <viewControllerLayoutGuide type="top" id="HWR-9i-bTL"/>
+                        <viewControllerLayoutGuide type="bottom" id="4aw-QN-dCy"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="CSW-iu-l60">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
@@ -983,8 +985,8 @@
             <objects>
                 <viewController id="W9w-vw-pRo" customClass="DropboxDeviceRecordDataDayViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="w6I-Gu-aUo"/>
-                        <viewControllerLayoutGuide type="bottom" id="jkM-eH-wHl"/>
+                        <viewControllerLayoutGuide type="top" id="mZL-Ki-65C"/>
+                        <viewControllerLayoutGuide type="bottom" id="xZj-yV-TWD"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="ACy-9K-ckX">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>

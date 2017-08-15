@@ -133,7 +133,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2801A91F15FF95D5006B74F3 /* ReadMe.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ReadMe.txt; sourceTree = SOURCE_ROOT; };
 		2806993215FD47DC008A50C0 /* APLGyroGraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLGyroGraphViewController.h; sourceTree = "<group>"; };
 		2806993315FD47DC008A50C0 /* APLGyroGraphViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLGyroGraphViewController.m; sourceTree = "<group>"; };
 		2852E51415FB1E3C0093D0E7 /* APLDeviceMotionGraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLDeviceMotionGraphViewController.h; sourceTree = "<group>"; };
@@ -515,7 +514,6 @@
 			isa = PBXGroup;
 			children = (
 				28DDC9C115F858BB00570985 /* MotionGraphsStoryboard.storyboard */,
-				2801A91F15FF95D5006B74F3 /* ReadMe.txt */,
 				E97247F219D57D810050A8BB /* MotionGraphs.entitlements */,
 				E9D3F3A619FFADBF00EF97AB /* Models */,
 				E9D7D21719EA7E43007C96A9 /* View */,
