@@ -188,25 +188,6 @@
             </objects>
             <point key="canvasLocation" x="5340" y="523"/>
         </scene>
-        <!--Map View Controller-->
-        <scene sceneID="NTY-m2-y7h">
-            <objects>
-                <viewController id="DtS-o0-nPn" customClass="MapViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="uot-WP-BaZ"/>
-                        <viewControllerLayoutGuide type="bottom" id="ggL-Na-56v"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="dDm-LD-TLv">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="SVd-gn-M91"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="QYZ-S3-xYV" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3975" y="-812"/>
-        </scene>
         <!--Sandbox Detail View Controller-->
         <scene sceneID="lYT-zt-SuD">
             <objects>
@@ -400,63 +381,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Xmv-H2-F7B" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3429" y="-280"/>
-        </scene>
-        <!--Graph View Controller-->
-        <scene sceneID="BNQ-sw-8Sd">
-            <objects>
-                <viewController id="Uvm-hq-hSz" customClass="FFTGraphViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="qb6-Ge-hdu"/>
-                        <viewControllerLayoutGuide type="bottom" id="Z2c-z3-iHu"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="9NZ-nI-dCf">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="qMQ-es-gXw"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GP8-wn-fuk" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="5549" y="-279"/>
-        </scene>
-        <!--Acc Graph View Controller-->
-        <scene sceneID="Nhi-K1-8f5">
-            <objects>
-                <viewController id="DTh-6B-S9Z" customClass="AccGraphViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="EFf-7N-Tf4"/>
-                        <viewControllerLayoutGuide type="bottom" id="IUI-d4-Js5"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="0kf-dd-e4D">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="KyL-ha-qAw"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GDo-44-M9N" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="5010" y="-438"/>
-        </scene>
-        <!--Rotation Graph View Controller-->
-        <scene sceneID="NQH-22-uVp">
-            <objects>
-                <viewController id="EaD-tH-5QE" customClass="RotationGraphViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="l15-Ce-UJg"/>
-                        <viewControllerLayoutGuide type="bottom" id="gJE-lg-LSv"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="rUL-Yi-Apk">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="VHZ-15-5uh"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="7DG-sy-m04" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4504" y="-627"/>
         </scene>
         <!--Record Setting View Controller-->
         <scene sceneID="GtE-dS-e11">
@@ -853,6 +777,8 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="P9j-Wg-Vh4" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="monitor" image="monitor" id="2aL-vU-8KZ"/>
                     <toolbarItems/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="y6r-RD-Ujh">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -876,6 +802,8 @@
                     <tabBarItem key="tabBarItem" title="SandBox" image="sandbox" id="5xI-28-itT"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="sVO-cq-I3R"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="i55-oL-Ebo">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -899,6 +827,8 @@
                     <tabBarItem key="tabBarItem" title="Cloud" image="dropbox" id="8HE-5N-fIO"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="60d-1q-Wxf"/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="736"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="NFa-yn-Dow">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -921,7 +851,9 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0gy-lv-6DB" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Record Settings" image="option" id="s0G-kj-wM0"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="JsN-WC-8zY">
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="736"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" id="JsN-WC-8zY">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">
@@ -942,6 +874,8 @@
             <objects>
                 <tabBarController storyboardIdentifier="APLAccelerometerGraphViewController03" automaticallyAdjustsScrollViewInsets="NO" id="3vD-DM-kBQ" sceneMemberID="viewController">
                     <toolbarItems/>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="414" height="736"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="Yux-iV-2BN">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
