@@ -2,6 +2,7 @@
 ### MotionGraphs ###
 
 ===========================================================================
+
 DESCRIPTION:
 
 MotionGraphs is an application project that demonstrates a how to use the push method to receive data from Core Motion. It displays graphs of accelerometer, gyroscope and device motion data.
@@ -19,4 +20,5 @@ MotionGraphsAppDelegate — A standard implementation of the UIApplicationDelega
 If you run the compiled application on a device that does not have a gyroscope, no gyroscope or device motion data will be available. You cannot effectively run the application on the simulator.
 
 ===========================================================================
+
 Copyright (C) 2012 Apple Inc. All rights reserved.
