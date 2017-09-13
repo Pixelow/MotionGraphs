@@ -23,6 +23,7 @@
 		28DDC9D115F859B000570985 /* APLGraphView.m in Sources */ = {isa = PBXBuildFile; fileRef = 28DDC9CF15F859B000570985 /* APLGraphView.m */; };
 		28DDCA1015F85C5D00570985 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28DDCA0F15F85C5D00570985 /* CoreMotion.framework */; };
 		28EB72EA160506340094726B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 28EB72EC160506340094726B /* Localizable.strings */; };
+		79097C451F68B4280094F529 /* APLCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 79097C441F68B4280094F529 /* APLCloud.m */; };
 		792678B61EC22F0800487AEE /* APLSAMath.m in Sources */ = {isa = PBXBuildFile; fileRef = 792678B31EC22F0800487AEE /* APLSAMath.m */; };
 		792678B71EC22F0800487AEE /* APLSAMultisectorControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 792678B51EC22F0800487AEE /* APLSAMultisectorControl.m */; };
 		79280B951EED3ED3003F9310 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79280B941EED3ED3003F9310 /* CloudKit.framework */; };
@@ -45,7 +46,6 @@
 		E91DB3051B4F5AEE00885F90 /* AccGraphViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E91DB3041B4F5AEE00885F90 /* AccGraphViewController.m */; };
 		E92591531AE9DCEF004BC2E3 /* BufferRecords.m in Sources */ = {isa = PBXBuildFile; fileRef = E92591521AE9DCEF004BC2E3 /* BufferRecords.m */; };
 		E92591561AE9EA7D004BC2E3 /* SeismicRecords.m in Sources */ = {isa = PBXBuildFile; fileRef = E92591551AE9EA7D004BC2E3 /* SeismicRecords.m */; };
-		E92FD9031BD4FBD30008A601 /* libc++.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E92FD9021BD4FBD30008A601 /* libc++.1.dylib */; };
 		E932C5731CD9F82200582292 /* RecordSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E932C5721CD9F82200582292 /* RecordSettingViewController.m */; };
 		E9400F761E546DBD001F990B /* libCorePlot-CocoaTouch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9400F6D1E546D67001F990B /* libCorePlot-CocoaTouch.a */; };
 		E941C5151A14825800BEC0A9 /* AppSandboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E941C5141A14825800BEC0A9 /* AppSandboxViewController.m */; };
@@ -157,6 +157,8 @@
 		28DDCA0F15F85C5D00570985 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		28EB72E71605028C0094726B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MotionGraphsStoryboard.storyboard; sourceTree = "<group>"; };
 		28EB72EB160506340094726B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		79097C431F68B4280094F529 /* APLCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLCloud.h; sourceTree = "<group>"; };
+		79097C441F68B4280094F529 /* APLCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLCloud.m; sourceTree = "<group>"; };
 		792678B21EC22F0700487AEE /* APLSAMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLSAMath.h; sourceTree = "<group>"; };
 		792678B31EC22F0800487AEE /* APLSAMath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLSAMath.m; sourceTree = "<group>"; };
 		792678B41EC22F0800487AEE /* APLSAMultisectorControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLSAMultisectorControl.h; sourceTree = "<group>"; };
@@ -200,7 +202,6 @@
 		E92591521AE9DCEF004BC2E3 /* BufferRecords.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BufferRecords.m; sourceTree = "<group>"; };
 		E92591541AE9EA7D004BC2E3 /* SeismicRecords.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SeismicRecords.h; sourceTree = "<group>"; };
 		E92591551AE9EA7D004BC2E3 /* SeismicRecords.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SeismicRecords.m; sourceTree = "<group>"; };
-		E92FD9021BD4FBD30008A601 /* libc++.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.1.dylib"; path = "../../../../usr/lib/libc++.1.dylib"; sourceTree = "<group>"; };
 		E932C5711CD9F82200582292 /* RecordSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordSettingViewController.h; sourceTree = "<group>"; };
 		E932C5721CD9F82200582292 /* RecordSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordSettingViewController.m; sourceTree = "<group>"; };
 		E9400F541E546D67001F990B /* CorePlot.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CorePlot.xcodeproj; path = "Core Plot framework/CorePlot.xcodeproj"; sourceTree = "<group>"; };
@@ -454,7 +455,6 @@
 				79280B951EED3ED3003F9310 /* CloudKit.framework in Frameworks */,
 				E9400F761E546DBD001F990B /* libCorePlot-CocoaTouch.a in Frameworks */,
 				E96A703D1CBE689F00EC12BF /* MapKit.framework in Frameworks */,
-				E92FD9031BD4FBD30008A601 /* libc++.1.dylib in Frameworks */,
 				28DDC9AA15F858BB00570985 /* UIKit.framework in Frameworks */,
 				E9CCAF851A403FC300A6512B /* Accelerate.framework in Frameworks */,
 				E99DB1EC19F68A450010DEEB /* CoreLocation.framework in Frameworks */,
@@ -496,7 +496,6 @@
 				E94011421E557BB9001F990B /* AVKit.framework */,
 				E94011211E54706A001F990B /* CorePlot Frameworks */,
 				E96A703C1CBE689F00EC12BF /* MapKit.framework */,
-				E92FD9021BD4FBD30008A601 /* libc++.1.dylib */,
 				E9ED03C41A46F6E8006764D0 /* AVFoundation.framework */,
 				E9CCAF841A403FC300A6512B /* Accelerate.framework */,
 				E99DB1EB19F68A450010DEEB /* CoreLocation.framework */,
@@ -515,6 +514,7 @@
 			children = (
 				28DDC9C115F858BB00570985 /* MotionGraphsStoryboard.storyboard */,
 				E97247F219D57D810050A8BB /* MotionGraphs.entitlements */,
+				79097C351F68B36E0094F529 /* ViewModel */,
 				E9D3F3A619FFADBF00EF97AB /* Models */,
 				E9D7D21719EA7E43007C96A9 /* View */,
 				E9D7D21919EA7E72007C96A9 /* otherDevices */,
@@ -540,6 +540,15 @@
 				28DDC9BF15F858BB00570985 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		79097C351F68B36E0094F529 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				79097C431F68B4280094F529 /* APLCloud.h */,
+				79097C441F68B4280094F529 /* APLCloud.m */,
+			);
+			name = ViewModel;
 			sourceTree = "<group>";
 		};
 		799CC9011EBF6CF200BDE076 /* Resouce */ = {
@@ -1092,6 +1101,7 @@
 				799CC8F41EBDF86600BDE076 /* APLViralSwitch.m in Sources */,
 				799CC9081EC2226F00BDE076 /* APLPulsingHaloLayer.m in Sources */,
 				E9CCAF831A3F173B00A6512B /* APLAccelerometerGraphViewController03.m in Sources */,
+				79097C451F68B4280094F529 /* APLCloud.m in Sources */,
 				E9F53EDC1B0CBB7A0016D323 /* FFTGraphViewController.m in Sources */,
 				E932C5731CD9F82200582292 /* RecordSettingViewController.m in Sources */,
 				79280BA41EF15B3C003F9310 /* DropboxViewController.m in Sources */,

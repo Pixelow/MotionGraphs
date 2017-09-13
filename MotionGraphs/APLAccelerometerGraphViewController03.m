@@ -31,7 +31,7 @@
 
 @property (strong,nonatomic) BufferRecords *bufferRecord;
 @property (strong,nonatomic) SeismicRecords *seismicRecord;
-@property (strong,nonatomic) AccelerationRecords *accelerationRecord;
+//@property (strong,nonatomic) AccelerationRecords *accelerationRecord;
 @property (strong,nonatomic) AppSandboxDetailViewController *asdvc;
 @property BOOL InitialBuffer, WeAreRecording, remoteNotification, isRemoteFunctionOn, isStopByButton, remoteStartStop, remoteBuffer, forceStartStopTrigger, isInTheSameDayFolder, uploadSummary, isWaitingForceTriggered, isForceTriggered;
 
@@ -161,11 +161,11 @@
     
     // 设置同步开关效果
     self.mySwitch.completionOn = ^{
-        NSLog(@"Animation On");
+//        NSLog(@"Animation On");
     };
     
     self.mySwitch.completionOff = ^{
-        NSLog(@"Animation Off");
+//        NSLog(@"Animation Off");
     };
     
     self.mySwitch.animationElementsOn =
@@ -225,7 +225,7 @@
     // ------ Read the contents of file from iCloud Drive on background thread so that main thread is not blocked -----------
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
+    
         NSString *destDir = [NSString stringWithFormat:@"/%@/%@",@"Record Parameters",@"Setting Folder"];
         NSURL *url = [self queryUbiquityFileURL:destDir fileName:@"status.txt"];
         APLDocument *document = [APLDocument alloc];
@@ -493,7 +493,7 @@
     float accelerometerMin;
     if (!self.userSamplingRate) {
         accelerometerMin = 0.01;
-    }else{
+    } else {
         accelerometerMin = 1/self.userSamplingRate;
     }
     
@@ -546,10 +546,9 @@
             if (self.InitialBuffer || self.remoteBuffer) {
                 
                 if (!self.bufferRecord) {
-                    self.bufferRecord=[[BufferRecords alloc]initWithData:acc];
+                    self.bufferRecord = [[BufferRecords alloc] initWithData:acc];
                     [self.bufferRecord checkTriggerValue:acc WithRemoteSyncStatus:self.isRemoteFunctionOn WithTriggerThreshold:self.triggerThreshold];
-                    
-                }else{
+                } else {
                     [self.bufferRecord addAcceleros:acc];
                     [self.bufferRecord checkTriggerValue:acc WithRemoteSyncStatus:self.isRemoteFunctionOn WithTriggerThreshold:self.triggerThreshold];
                 }
@@ -565,13 +564,13 @@
  
 #pragma mark - Triggered/Not Triggered
             
-            if (self.bufferButton.isEnabled==YES) {
+            if (self.bufferButton.isEnabled == YES) {
                 if (self.bufferRecord.AreWeTriggered || self.seismicRecord.AreWeTriggered || self.remoteNotification)
                 {
                     self.bufferRecord.AreWeTriggered = NO;
 //                    self.remoteNotification = NO;
-                    self.InitialBuffer=NO;
-                    self.remoteBuffer=NO;
+                    self.InitialBuffer = NO;
+                    self.remoteBuffer = NO;
                     self.WeAreRecording = YES;
                     self.startRecordDate = [NSDate date];
                     [self.seismicRecord checkEventOfRecordingForAllActiveDevices:[NSDate date]];
@@ -601,12 +600,11 @@
                 }
         
                 if (!self.seismicRecord) {
-                    self.seismicRecord=[[SeismicRecords alloc]initWithData:acc];
+                    self.seismicRecord = [[SeismicRecords alloc] initWithData:acc];
                     [self.seismicRecord checkTriggerValue:acc WithRemoteSyncStatus:self.isRemoteFunctionOn WithTriggerThreshold:self.triggerThreshold];
-                }else{
+                } else {
                     [self.seismicRecord addAcceleros:acc];
                     [self.seismicRecord checkTriggerValue:acc WithRemoteSyncStatus:self.isRemoteFunctionOn WithTriggerThreshold:self.triggerThreshold];
-                    
                 }
                 self.endRecordDate = [NSDate date];
                 
@@ -614,37 +612,39 @@
                     [self.seismicRecord checkRecordTimeWithStartTime:self.startRecordDate WithEndTime:self.endRecordDate WithRecordTime:self.recordLength];
                 }
                 
- 
+
 #pragma mark - Check for Record Time to stop/Continue Record
                 
                 [self calculateTimeOfRecord];
-                if (self.seismicRecord.recordingStopped || self.timeOfRecord>300) {
+                if (self.seismicRecord.recordingStopped || self.timeOfRecord>60) {
+                    
                     [self stopRecording];
                     [self fileUploadToDeviceAndServer];
                     
-                    if (self.recordButton.isEnabled==YES && self.WeAreRecording==NO) {          // Only for manual mode of recording
+                    if (self.recordButton.isEnabled==YES && self.WeAreRecording==NO) {
+                        // Only for manual mode of recording
                         [self startRecording];          // Continue recording unless user force stop by pressing button
                     }
                     
-                }else if (!self.seismicRecord.recordingStopped){
+                } else if (!self.seismicRecord.recordingStopped) {
                  // continue Recording
-                    self.WeAreRecording=YES;
-                    self.InitialBuffer=NO;
+                    self.WeAreRecording = YES;
+                    self.InitialBuffer = NO;
                 }
                 
                 // Force Stop Seismic Record By Button
                 if (self.isStopByButton) {
                     [self stopRecording];
                     [self fileUploadToDeviceAndServer];
-                    self.isStopByButton=NO;
-                    self.InitialBuffer=NO;
+                    self.isStopByButton = NO;
+                    self.InitialBuffer = NO;
                     [self.bufferButton setTitle:NSLocalizedString(@"Start Buffer","") forState:UIControlStateNormal];
                     self.recordInfo.text = @"";
                     self.bufferRecord = nil; self.seismicRecord = nil;
-                }
-            }
-                        }];
                     }
+                }
+            }];
+        }
         }];
     }
     
@@ -656,7 +656,7 @@
 
 // ----------------------------------- Get Status Info: running status, battery status, memory consumption status --------------------
          
-- (void)notifyServerAboutStateOfApp{
+- (void)notifyServerAboutStateOfApp {
    
     NSTimeInterval nowTimeElapsed = fabs([self.notificationStartDate timeIntervalSinceNow]);
     if (nowTimeElapsed>1800) {
@@ -682,14 +682,14 @@
         [myDevice setBatteryMonitoringEnabled:YES];
         float batteryLevel = [myDevice batteryLevel];
         
-        NSString *messageString = [NSString stringWithFormat:@"Motion Graphs Application is currently running on device \n Memory in use (in MB): %lu \n Battery Level: %f",info.resident_size/(1024*1024), batteryLevel*100];
+        NSString *messageString = [NSString stringWithFormat:@"Motion Graphs Application is currently running on device \n Memory in use (in MB): %u \n Battery Level: %f",info.resident_size/(1024*1024), batteryLevel*100];
         
         NSString *destDir = [NSString stringWithFormat:@"/%@",folder];
 
         [self saveToiCloud:destDir fileName:statusFilename filePath:nil fileContent:messageString];
         
         // Reset the notification start time
-        self.notificationStartDate=[NSDate date];
+        self.notificationStartDate = [NSDate date];
     }
 }
 
@@ -727,11 +727,11 @@
 
         // Reset start buffer date for new buffer
         self.startBufferDate = [NSDate date];
-        self.InitialBuffer=YES;
+        self.InitialBuffer = YES;
         [self.bufferButton setTitle:NSLocalizedString(@"Stop Buffer","") forState:UIControlStateNormal];
         self.recordInfo.text = NSLocalizedString(@"Buffering","");
         
-    }else{
+    } else {
         
         self.bufferButton.enabled = YES;
         self.InitialBuffer = NO;
@@ -742,16 +742,17 @@
     
     NSString *stoppedRecord = NSLocalizedString(@"Stopped Recording at:",@"");
     self.statusOfRecord.text = [NSString stringWithFormat:@"%@ \n %@", stoppedRecord, [self.dateFormatter stringFromDate:self.endRecordDate].description];
-    NSLog(@"Stopped Recording");
+//    NSLog(@"Stopped Recording");
 
     if (!self.bufferRecord.bufferStringArray) {
-        self.bufferRecord.bufferStringArray = [[NSMutableArray alloc]initWithObjects:self.bufferRecord, nil];
-    }else{
+        self.bufferRecord.bufferStringArray = [[NSMutableArray alloc] initWithObjects:self.bufferRecord, nil];
+    } else {
         [self.bufferRecord.bufferStringArray addObject:self.bufferRecord];
     }
+    
     if (!self.seismicRecord.seismicStringArray) {
-        self.seismicRecord.seismicStringArray=[[NSMutableArray alloc]initWithObjects:self.seismicRecord,nil];
-    }else{
+        self.seismicRecord.seismicStringArray = [[NSMutableArray alloc] initWithObjects:self.seismicRecord,nil];
+    } else {
         [self.seismicRecord.seismicStringArray addObject:self.seismicRecord];
     }
     
@@ -761,16 +762,16 @@
 {
     if (self.bufferButton.isEnabled) {
         // Total time of Record
-        if (self.bufferRecord.bufferTimeLimitExceeded==YES) {
+        if (self.bufferRecord.bufferTimeLimitExceeded == YES) {
             if (!self.bufferLength) {
-                self.bufferLength=self.bufferRecord.bufferLength;
+                self.bufferLength = self.bufferRecord.bufferLength;
             }
             self.timeOfRecord = [self.endRecordDate timeIntervalSinceDate:self.recordedBufferDate] + self.bufferLength;
-        }else{
+        } else {
             self.timeOfRecord = [self.endRecordDate timeIntervalSinceDate:self.startBufferDate];
         }
         
-    }else{
+    } else {
         self.timeOfRecord = [self.endRecordDate timeIntervalSinceDate:self.startRecordDate];
     }
     
@@ -1032,7 +1033,7 @@
 {
     if ([segue.identifier isEqualToString:@"appsandboxtableview"]) {
         if ([segue.destinationViewController isKindOfClass:[AppSandboxViewController class]]) {
-            NSLog(@"Linked To AppSandboxTable View");
+//            NSLog(@"Linked To AppSandboxTable View");
         }
     }
 }
@@ -1073,11 +1074,11 @@
     if (url) {
         if ([manager fileExistsAtPath:[url path]] == NO)
         {
-            NSLog(@"iCloud Documents directory does not exist");
+//            NSLog(@"iCloud Documents directory does not exist");
             //创建M路径
             [manager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:nil];
         } else {
-            NSLog(@"iCloud Documents directory exist，不是我我很正常");
+//            NSLog(@"iCloud Documents directory exist");
         }
     }
     
@@ -1105,9 +1106,9 @@
         
         [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
             if (success) {
-                NSLog(@"创建文档成功.");
+//                NSLog(@"创建文档成功.");
             } else {
-                NSLog(@"创建文档失败.");
+//                NSLog(@"创建文档失败.");
             }
         }];
     }
@@ -1124,9 +1125,9 @@
     
     if ([manager fileExistsAtPath:[url path]] == NO)
     {
-        NSLog(@"iCloud Documents directory does not exist，我总是要调用很多次，为什么？");
+//        NSLog(@"iCloud Documents directory does not exist？");
     } else {
-        NSLog(@"iCloud Documents directory exist，我总是要调用很多次，为什么？");
+//        NSLog(@"iCloud Documents directory exist？");
     }
     
     //取得最终地址
@@ -1216,7 +1217,7 @@
 //        [self.triggeredInfoQuery startQuery];
     }
     
-    NSLog(@"我是remoteStartInfoDidUpdate, 我只触发了一次！");
+//    NSLog(@"我是remoteStartInfoDidUpdate");
 }
 
 - (void)remoteStopInfoDidUpdate:(NSNotification *)notification
@@ -1249,7 +1250,7 @@
             
             NSString *stoppedRecord = NSLocalizedString(@"Stopped Recording at:",@"");
             self.statusOfRecord.text = [NSString stringWithFormat:@"%@ \n %@", stoppedRecord, [self.dateFormatter stringFromDate:self.endRecordDate].description];
-            NSLog(@"Stopped Recording");
+//            NSLog(@"Stopped Recording");
         }
         
         if (weakSelf.WeAreRecording) {
@@ -1263,7 +1264,7 @@
     self.forceRemoteStartStopButton.backgroundColor = RGB_Alpha(31, 183, 252, 1);
     [self.forceRemoteStartStopButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    NSLog(@"我是remoteStopInfoDidUpdate, 我只触发了一次！");
+//    NSLog(@"我是remoteStopInfoDidUpdate");
 }
 
 - (void)forceRemoteStartInfoDidUpdate:(NSNotification *)notification
@@ -1281,7 +1282,7 @@
     // 目前判断远程记录的条件有weakSelf.remoteStartStop，但是weakSelf.remoteStartStop只在预警开始时候被设定为YES，预警结束则设定为NO，所以造成了预警开始后，无法人为的操作远程记录。
 //    if (!weakSelf.remoteStartStop && weakSelf.forceStartStopTrigger) {
     if (weakSelf.forceStartStopTrigger) {
-        weakSelf.forceStartStopTrigger=NO;
+        weakSelf.forceStartStopTrigger = NO;
         weakSelf.remoteStartStop = YES;
         [weakSelf startRecording];
         [weakSelf.forceRemoteStartStopButton setTitle:NSLocalizedString(@"Stop Record","") forState:
@@ -1291,7 +1292,7 @@
         self.halo.radius = 60;
     }
     
-    NSLog(@"我是forceRemoteStartInfoDidUpdate, 我只触发了一次！");
+//    NSLog(@"我是forceRemoteStartInfoDidUpdate");
 }
 
 - (void)forceRemoteStopInfoDidUpdate:(NSNotification *)notification
@@ -1317,8 +1318,8 @@
         }
         
         weakSelf.remoteBuffer = NO;
-        weakSelf.WeAreRecording=NO;
-        weakSelf.InitialBuffer=NO;
+        weakSelf.WeAreRecording = NO;
+        weakSelf.InitialBuffer = NO;
 //        [weakSelf.bufferButton setTitle:NSLocalizedString(@"Start Buffer","") forState:UIControlStateNormal];
         [weakSelf.forceRemoteStartStopButton setTitle:NSLocalizedString(@"Remote Record","") forState:UIControlStateNormal];
         weakSelf.recordInfo.text = @"";
@@ -1336,11 +1337,11 @@
             
             NSString *stoppedRecord = NSLocalizedString(@"Stopped Recording at:",@"");
             self.statusOfRecord.text = [NSString stringWithFormat:@"%@ \n %@", stoppedRecord, [self.dateFormatter stringFromDate:self.endRecordDate].description];
-            NSLog(@"Stopped Recording");
+//            NSLog(@"Stopped Recording");
         }
     }
 
-    NSLog(@"我是forceRemoteStopInfoDidUpdate, 我只触发了一次！");
+//    NSLog(@"我是forceRemoteStopInfoDidUpdate");
 }
 
 - (void)triggeredInfoDidUpdate:(NSNotification *)notification
@@ -1364,7 +1365,7 @@
     self.forceRemoteStartStopButton.backgroundColor = [UIColor darkGrayColor];
     [self.forceRemoteStartStopButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
     
-    NSLog(@"我是triggeredInfoDidUpdate, 我只触发了一次！");
+//    NSLog(@"我是triggeredInfoDidUpdate");
 }
 
 
