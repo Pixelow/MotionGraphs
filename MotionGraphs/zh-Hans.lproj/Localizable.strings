@@ -43,9 +43,12 @@
 "Recorded Data" = "记录数据";
 "Status Info" = "状态信息";
 "Supporting Files" = "支持文件";
+"Record Parameters" = "记录参数";
 
 "Force Remote Stop Info" = "远程强行终止";
 "Force Remote Start Info" = "远程强行开始";
 "Triggered Info" = "触发信息";
 "Remote Stop Info" = "远程终止记录";
 "Remote Start Info" = "远程开始记录";
+
+"This will be used to obtain or track your location." = "我们需要通过您的地理位置信息获取您周边的相关数据。";

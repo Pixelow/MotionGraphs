@@ -49,13 +49,12 @@
 #import "APLAppDelegate.h"
 #import "APLGraphViewController.h"
 
-@interface APLAppDelegate () <CLLocationManagerDelegate> 
+APLAppDelegate *del;
+
+@interface APLAppDelegate ()
 {
     CLLocationManager *locationManager;
-    CLGeocoder *geocoder;
-    CLPlacemark *placemark;
     CMMotionManager *motionmanager;
-    
 }
 
 @end
@@ -63,7 +62,7 @@
 @implementation APLAppDelegate
 
 @synthesize bgTask;
-
+@synthesize locationManager;
 
 - (CMMotionManager *)sharedManager
 {
@@ -74,28 +73,29 @@
     return motionmanager;
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    
+//- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+//    
 //    DBAccount *account = [[DBAccountManager sharedManager]handleOpenURL:url];
 //    if (account) {
 //        NSLog(@"App Linked Successfully");
 //        return YES;
 //    }
-    
-    return NO;
-}
+//    
+//    return NO;
+//}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     NSLog(@"Starting app");
+    
+    del = self;
     
 //    DBAccountManager *accountManager = [[DBAccountManager alloc]initWithAppKey:@"ovziot34hyqvmlo" secret:@"japsx06g5nhkkqy"];
 //    [DBAccountManager setSharedManager:accountManager];
     
     //--------------------------- Initialize Location Updates --------------------------------
     
-    locationManager = [[CLLocationManager alloc]init];
-    geocoder = [[CLGeocoder alloc]init];
+    locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     locationManager.distanceFilter = kCLDistanceFilterNone;
@@ -104,6 +104,9 @@
         [locationManager requestWhenInUseAuthorization];
     }
     
+    locationManager.pausesLocationUpdatesAutomatically = NO;
+    locationManager.allowsBackgroundLocationUpdates = YES;
+
     [locationManager startUpdatingLocation];
     
     // ---------------------------------------------------------------------------------------
@@ -127,22 +130,18 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    CLLocationManager * manager = [[CLLocationManager alloc]init];
-    manager.delegate = self;
+//    CLLocationManager *manager = [[CLLocationManager alloc] init];
+//    manager.delegate = self;
     
     NSLog(@"application did enter background called");
     UIApplication *thisApp = [UIApplication sharedApplication];
     bgTask = [thisApp beginBackgroundTaskWithExpirationHandler:^{
     }];
     
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         //run the app with starting UpdatingLocation. backgroundTimeRemaining decremented from 600.00
-        [manager startUpdatingLocation];
-        manager.pausesLocationUpdatesAutomatically = NO;
-        manager.allowsBackgroundLocationUpdates = YES;
-        
+        [locationManager startUpdatingLocation];
         [self printTimeRemaining];
         
         while (YES) {

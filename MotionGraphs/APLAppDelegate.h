@@ -51,11 +51,14 @@
 #import <CoreLocation/CoreLocation.h>
 #import "CorePlot-CocoaTouch.h"
 
-@interface APLAppDelegate : UIResponder <UIApplicationDelegate>
+@interface APLAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate>
 
 @property (strong, nonatomic) UITabBarController *tabarController;
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic, readonly) CMMotionManager *sharedManager;
+@property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) UIBackgroundTaskIdentifier bgTask;
 
 @end
+
+extern APLAppDelegate *del;

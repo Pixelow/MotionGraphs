@@ -101,6 +101,8 @@
         iCloudDriveRootPath = NSLocalizedString(@"Status Info", "");
     } else if ([[self.iCloudDriveRootPaths objectAtIndex:indexPath.row] isEqualToString:@"Supporting Files"]) {
         iCloudDriveRootPath = NSLocalizedString(@"Supporting Files", "");
+    } else if ([[self.iCloudDriveRootPaths objectAtIndex:indexPath.row] isEqualToString:@"Record Parameters"]) {
+        iCloudDriveRootPath = NSLocalizedString(@"Record Parameters", "");
     }
     
     cell.textLabel.text = [NSString stringWithFormat:@"%@", iCloudDriveRootPath];

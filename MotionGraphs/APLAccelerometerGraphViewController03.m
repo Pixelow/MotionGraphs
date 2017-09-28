@@ -16,6 +16,7 @@
 #import "APLWaveformView.h"
 #import "AppSandboxViewController.h"
 #import "APLDocument.h"
+#import "APLCloudFile.h"
 #import "BufferRecords.h"
 #import "SeismicRecords.h"
 #import "AppSandboxDetailViewController.h"
@@ -77,6 +78,11 @@
 @property (strong, nonatomic) NSMetadataQuery *forceRemoteStopQuery;
 @property (strong, nonatomic) NSMetadataQuery *triggeredInfoQuery;
 
+@property (nonatomic) APLDocument *document;
+@property (nonatomic) NSFileManager *manager;
+@property (nonatomic) NSURL *rootUrl;
+@property (nonatomic) NSURL *destinationUrl;
+
 @end
 
 
@@ -87,6 +93,10 @@
 - (void)viewDidLoad {
     
     [super viewDidLoad];
+    
+    //取得云端URL基地址(参数中传入nil则会默认获取第一个容器)，需要一个容器标示
+    _manager = [NSFileManager defaultManager];
+    _rootUrl = [_manager URLForUbiquityContainerIdentifier:UBIQUITY_CONTAINER_URL];
     
     // Init Frames
     
@@ -616,7 +626,7 @@
 #pragma mark - Check for Record Time to stop/Continue Record
                 
                 [self calculateTimeOfRecord];
-                if (self.seismicRecord.recordingStopped || self.timeOfRecord>60) {
+                if (self.seismicRecord.recordingStopped || self.timeOfRecord>10) {
                     
                     [self stopRecording];
                     [self fileUploadToDeviceAndServer];
@@ -686,7 +696,11 @@
         
         NSString *destDir = [NSString stringWithFormat:@"/%@",folder];
 
+//        APLCloudFile *file =
         [self saveToiCloud:destDir fileName:statusFilename filePath:nil fileContent:messageString];
+        
+//        DBFile *file = [[DBFilesystem sharedFilesystem]createFile:newPath error:nil];
+//        [file writeString:messageString error:nil];
         
         // Reset the notification start time
         self.notificationStartDate = [NSDate date];
@@ -711,7 +725,7 @@
 
 - (void)startRecording
 {
-    self.WeAreRecording=YES;
+    self.WeAreRecording = YES;
     self.startRecordDate = [NSDate date];
     self.bufferButton.enabled = NO;
     [self.recordButton setTitle:NSLocalizedString(@"Stop Record","") forState:UIControlStateNormal];
@@ -850,13 +864,9 @@
     
     // write to local app sandbox (only if triggered)
     if (self.seismicRecord.maxPGA>self.triggerThreshold) {
-        
         NSString *localDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
         NSString *localPath = [localDir stringByAppendingPathComponent:filename];
-        [dataString writeToFile:localPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        
         NSString *destDir = [NSString stringWithFormat:@"/%@/%@",@"Triggered Data",dayFolder];
-        
         [self saveToiCloud:destDir fileName:filename filePath:localPath fileContent:dataString];
     }
     
@@ -1029,7 +1039,7 @@
 // --------------------------------------------------------------------------------------------------------------------------------
 
 
-- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"appsandboxtableview"]) {
         if ([segue.destinationViewController isKindOfClass:[AppSandboxViewController class]]) {
@@ -1064,28 +1074,26 @@
  */
 
 - (NSURL *)getUbiquityFileURL:(NSString *)destinationDiractory fileName:(NSString *)fileName {
-    //取得云端URL基地址(参数中传入nil则会默认获取第一个容器)，需要一个容器标示
-    NSFileManager *manager = [NSFileManager defaultManager];
-    NSURL *url = [manager URLForUbiquityContainerIdentifier:UBIQUITY_CONTAINER_URL];
-    //取得Documents目录
-    url = [url URLByAppendingPathComponent:@"Documents"];
-    url = [url URLByAppendingPathComponent:destinationDiractory];
 
-    if (url) {
-        if ([manager fileExistsAtPath:[url path]] == NO)
+    //取得Documents目录
+    _destinationUrl = [_rootUrl URLByAppendingPathComponent:@"Documents"];
+    _destinationUrl = [_destinationUrl URLByAppendingPathComponent:destinationDiractory];
+
+    if (_destinationUrl) {
+        if ([_manager fileExistsAtPath:[_destinationUrl path]] == NO)
         {
 //            NSLog(@"iCloud Documents directory does not exist");
             //创建M路径
-            [manager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:nil];
+            [_manager createDirectoryAtURL:_destinationUrl withIntermediateDirectories:YES attributes:nil error:nil];
         } else {
 //            NSLog(@"iCloud Documents directory exist");
         }
     }
     
     //取得最终地址
-    url = [url URLByAppendingPathComponent:fileName];
+    _destinationUrl = [_destinationUrl URLByAppendingPathComponent:fileName];
     
-    return url;
+    return _destinationUrl;
 }
 
 
@@ -1097,18 +1105,25 @@
     
     if (url) {
         
-        APLDocument *document = [[APLDocument alloc] initWithFileURL:url];
-        document.data = [fileContent dataUsingEncoding:NSUTF8StringEncoding];
+        _document = [[APLDocument alloc] initWithFileURL:url];
+        _document.data = [fileContent dataUsingEncoding:NSUTF8StringEncoding];
         
         if (!filePath) {
             
         }
         
-        [document saveToURL:url forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
+        [_document saveToURL:url forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
             if (success) {
 //                NSLog(@"创建文档成功.");
+                _document.data = nil;
             } else {
 //                NSLog(@"创建文档失败.");
+                // write to local app sandbox (only if triggered)
+                if (self.seismicRecord.maxPGA>self.triggerThreshold) {
+                    NSString *localDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+                    NSString *localPath = [localDir stringByAppendingPathComponent:filename];
+                    [fileContent writeToFile:localPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                }
             }
         }];
     }
