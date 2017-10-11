@@ -626,7 +626,7 @@
 #pragma mark - Check for Record Time to stop/Continue Record
                 
                 [self calculateTimeOfRecord];
-                if (self.seismicRecord.recordingStopped || self.timeOfRecord>10) {
+                if (self.seismicRecord.recordingStopped || self.timeOfRecord>300) {
                     
                     [self stopRecording];
                     [self fileUploadToDeviceAndServer];

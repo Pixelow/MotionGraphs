@@ -108,44 +108,23 @@
             } else {
                 
                 // Do not perform seque instead present the information in alert view
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@"Please download the file from the iCloud Drive App first." preferredStyle:UIAlertControllerStyleAlert];
-                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
-                [alertController addAction:ok];
-                UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-                [vc presentViewController:alertController animated:YES completion:nil];
                 
-//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                    
-//                    // url of document to transfer from iCloud
-//                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);//程序文件夹主目录
-//                    NSString *documentsDirectory = [paths objectAtIndex:0];//Document目录
-//                    NSURL *localURL = [NSURL URLWithString:documentsDirectory];
-//                    
-//                    NSString *fileName = [self.recordedDataContentsUrl[indexPath.row] lastPathComponent];
-//                    
-//                    // 取得Documents目录
-//                    localURL = [localURL URLByAppendingPathComponent:@"Status Info"];
-//                    localURL = [localURL URLByAppendingPathComponent:@"Moi.Msm"];
-//                    localURL = [localURL URLByAppendingPathComponent:fileName];
-//                    
-//                    NSURL *iCloudURL = self.recordedDataContentsUrl[indexPath.row];
-//                    NSError *error = nil;
-//                    [[[NSFileManager alloc] init] setUbiquitous:NO
-//                                                      itemAtURL:localURL
-//                                                 destinationURL:iCloudURL
-//                                                          error:&error]; // move the document
-//                    
-//                    APLDocument *deviceRecord = [APLDocument alloc];
-//                    [deviceRecord readFromURL:self.recordedDataContentsUrl[indexPath.row] error:nil];
-//                    self.infoDataContents =  [[NSString alloc] initWithData:deviceRecord.data encoding:NSUTF8StringEncoding];
-//                    // Do not perform seque instead present the information in alert view
-//                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"File Information" message:self.infoDataContents preferredStyle:UIAlertControllerStyleAlert];
-//                    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
-//                    [alertController addAction:ok];
-//                    UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-//                    [vc presentViewController:alertController animated:YES completion:nil];
-//                    
-//                });
+                NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                [fileCoordinator coordinateReadingItemAtURL:self.recordedDataContentsUrl[indexPath.row]
+                                                    options:NSFileCoordinatorReadingWithoutChanges
+                                                      error:nil
+                                                 byAccessor:^(NSURL * _Nonnull newURL)
+                 {
+                     NSString *contStr = [NSString stringWithContentsOfURL:newURL encoding:NSUTF8StringEncoding error:nil];
+                     self.infoDataContents =  [[NSString alloc] initWithString:contStr];
+                     // Do not perform seque instead present the information in alert view
+                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"File Information" message:self.infoDataContents preferredStyle:UIAlertControllerStyleAlert];
+                     UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+                     [alertController addAction:ok];
+                     UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+                     [vc presentViewController:alertController animated:YES completion:nil];
+                 }];
+
             }
             
 
