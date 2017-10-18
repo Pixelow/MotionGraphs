@@ -7,7 +7,7 @@
 //
 
 #import "Accelero.h"
-#import <CoreLocation/CoreLocation.h>
+//#import <CoreLocation/CoreLocation.h>
 
 @interface AccelerationRecords : Accelero
 
@@ -22,6 +22,6 @@
 
 -(void) addAcceleros:(Accelero *)acc;
 -(void) removeAcceleros:(Accelero *)acc;
-- (id) initWithData:(Accelero *)acc;
+-(id) initWithData:(Accelero *)acc;
 
 @end

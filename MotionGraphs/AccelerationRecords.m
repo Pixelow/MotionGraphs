@@ -8,17 +8,18 @@
 
 #import "AccelerationRecords.h"
 #import "APLWGS84TOGCJ02.h"
+#import "APLAppDelegate.h"
 
 @interface AccelerationRecords() <CLLocationManagerDelegate>
-
-@end
-
-@implementation AccelerationRecords
 {
     CLLocationManager *locationManager;
     CLGeocoder *geocoder;
     CLPlacemark *placemark;
 }
+
+@end
+
+@implementation AccelerationRecords
 
 -(NSMutableArray *)acceleros
 {
@@ -64,28 +65,33 @@
 -(NSMutableArray *)locationArray
 {
     [self myCoordinate];
-    NSMutableArray *locationArray = [[NSMutableArray alloc]initWithObjects:self.longitudeLabel, self.latitudeLabel, self.addressLabel, nil];
+    NSMutableArray *locationArray = [[NSMutableArray alloc] initWithObjects:self.longitudeLabel, self.latitudeLabel, self.addressLabel, nil];
     return locationArray;
 }
 
 -(CLLocationCoordinate2D)myCoordinate
 {
     //--------------------------- Initialize Location Updates --------------------------------
-    locationManager = [[CLLocationManager alloc] init];
-    geocoder = [[CLGeocoder alloc] init];
-    locationManager.delegate = self;
-    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    locationManager.distanceFilter = kCLDistanceFilterNone;
     
-    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-        [locationManager requestWhenInUseAuthorization];
-    }
-    [locationManager startUpdatingLocation];
+//    locationManager = [[CLLocationManager alloc] init];
+//    geocoder = [[CLGeocoder alloc] init];
+//    locationManager.delegate = self;
+//    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+//    locationManager.distanceFilter = kCLDistanceFilterNone;
+//    
+//    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+//        [locationManager requestWhenInUseAuthorization];
+//    }
+//    
+//    [locationManager startUpdatingLocation];
+    
     // ---------------------------------------------------------------------------------------
-    
-    CLLocation *location = [locationManager location];
+
+    CLLocation *location = [del.locationManager location];
+//    CLLocation *location = [locationManager location];
     CLLocationCoordinate2D coordinate = [location coordinate];
     
+    //引入APLWGS84TOGCJ02
     if ([APLWGS84TOGCJ02 isLocationInChina:coordinate]) {
         
         coordinate = [APLWGS84TOGCJ02 transformFromWGSToGCJ:coordinate];

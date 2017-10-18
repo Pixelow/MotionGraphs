@@ -43,9 +43,12 @@
 "Recorded Data" = "記録データ";
 "Status Info" = "ステータス情報";
 "Supporting Files" = "サポートファイル";
+"Record Parameters" = "記録パラメータ";
 
 "Force Remote Stop Info" = "遠隔強制終瞭";
 "Force Remote Start Info" = "遠隔強制開始";
 "Triggered Info" = "トリガ情報";
 "Remote Stop Info" = "遠隔停止記録";
 "Remote Start Info" = "遠隔開始記録";
+
+"This will be used to obtain or track your location." = "これがあなたの位置情報を得るために使用されます。";
