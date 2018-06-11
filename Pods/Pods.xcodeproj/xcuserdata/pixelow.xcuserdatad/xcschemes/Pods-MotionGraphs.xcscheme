@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'AB1DEDE77FD9E52143102967C5A97C77'
-               BlueprintName = 'Pods-MotionGraphs'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'libPods-MotionGraphs.a'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "251B0D3B65B3F1A4A044B84188BC14A8"
+               BlueprintName = "Pods-MotionGraphs"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "libPods-MotionGraphs.a">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

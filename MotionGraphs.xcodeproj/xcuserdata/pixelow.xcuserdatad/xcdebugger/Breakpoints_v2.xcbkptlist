@@ -73,13 +73,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MotionGraphs/AccelerationRecords.m"
-            timestampString = "527528376.897468"
+            filePath = "MotionGraphs/DropboxDeviceRecordDataViewController.m"
+            timestampString = "529423861.434721"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
-            landmarkName = "-locationArray"
+            startingLineNumber = "138"
+            endingLineNumber = "138"
+            landmarkName = "-prepareForSegue:sender:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -89,13 +89,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MotionGraphs/DropboxDeviceRecordDataViewController.m"
-            timestampString = "529423861.434721"
+            filePath = "MotionGraphs/APLAccelerometerGraphViewController03.m"
+            timestampString = "549961852.395862"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
-            landmarkName = "-prepareForSegue:sender:"
+            startingLineNumber = "438"
+            endingLineNumber = "438"
+            landmarkName = "-liveQuery:objectDidUpdate:updatedKeys:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MotionGraphs/APLAccelerometerGraphViewController03.m"
+            timestampString = "549961852.397734"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "323"
+            endingLineNumber = "323"
+            landmarkName = "-liveQuery:objectDidCreate:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

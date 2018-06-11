@@ -48,6 +48,7 @@
 
 #import "APLAppDelegate.h"
 #import "APLGraphViewController.h"
+#import "AVOSCloud.h"
 
 APLAppDelegate *del;
 
@@ -120,6 +121,9 @@ APLAppDelegate *del;
     //设置用户语言为当前系统语言
     [defaults setObject:currentLanguage forKey:@"user_lang_string"];
     
+    //LeanCloud即时通讯
+    [AVOSCloud setApplicationId:@"2vwh1TYLAQQx3lClxPmNj39v-gzGzoHsz" clientKey:@"vOLGzfgbSHRpC1Wpyque8DcY"];
+    [AVOSCloud setAllLogsEnabled:YES];
     return YES;
 }
 
@@ -151,17 +155,18 @@ APLAppDelegate *del;
 }
 
 -(void)printTimeRemaining {
-    NSLog(@"Background Task Time Remaining: %f",[[UIApplication sharedApplication]backgroundTimeRemaining]);
+    NSLog(@"Background Task Time Remaining: %f", [[UIApplication sharedApplication] backgroundTimeRemaining]);
 }
 
 -(void)applicationWillEnterForeground:(UIApplication *)application
 {
     NSLog(@"application will enter foreground called");
+    //
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    NSLog(@"App is active");
+    
 }
 
 -(void)applicationWillTerminate:(UIApplication *)application
