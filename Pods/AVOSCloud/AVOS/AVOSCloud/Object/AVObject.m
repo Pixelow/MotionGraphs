@@ -93,13 +93,25 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 
 #pragma clang diagnostic pop
 
-@implementation AVObject
+@implementation AVObject {
+    
+    NSLock *_lock;
+}
 
 @synthesize uuid = _uuid;
 @synthesize isPointer = _isPointer;
 @synthesize operationQueue = _operationQueue;
 @synthesize running = _running;
 @synthesize requestLock = _requestLock;
+
+// MARK: - Internal Sync Lock
+
+- (void)internalSyncLock:(void (^)(void))block
+{
+    [self->_lock lock];
+    block();
+    [self->_lock unlock];
+}
 
 #pragma mark - Utils Methods
 
@@ -209,6 +221,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     self = [super init];
     if (self)
     {
+        _lock = [[NSLock alloc] init];
         _className = [[self class] parseClassName];
         _localData = [[NSMutableDictionary alloc] init];
         _estimatedData = [[NSMutableDictionary alloc] init];
@@ -258,33 +271,29 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     [aCoder encodeObject:_relationData forKey:@"relationData"];
 }
 
--(NSArray *)allArray
-{
-    NSArray * array = @[self.localData, self.estimatedData, self.relationData];
-    return array;
-}
-
 - (NSArray *)allKeys
 {
-    NSMutableArray * result = [[NSMutableArray alloc] init];
-    for (NSMutableDictionary * dict in [self allArray])
-    {
-        [result addObjectsFromArray:[dict allKeys]];
-    }
-    return [result copy];
+    __block NSMutableArray *result = [NSMutableArray array];
+    [self internalSyncLock:^{
+        for (NSMutableDictionary *dic in @[self->_localData, self.estimatedData, self.relationData]) {
+            [result addObjectsFromArray:dic.allKeys];
+        }
+    }];
+    return result.copy;
 }
 
 -(id)valueForUndefinedKey:(NSString *)key {
     // search in local data and estimated data
-    id object = nil;
-    for (NSMutableDictionary * dict in @[self.localData, self.estimatedData])
-    {
-        object = [dict objectForKey:key];
-        if (object) {
-            return object;
+    __block id object = nil;
+    [self internalSyncLock:^{
+        object = self->_localData[key];
+        if (!object) {
+            object = self.estimatedData[key];
         }
+    }];
+    if (object) {
+        return object;
     }
-    
     // dynamic property
     if ([self.relationData objectForKey:key] != nil) {
         object = [self relationForKey:key];
@@ -327,11 +336,13 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
             [self setValue:value forKey:key];
             self.inSetter = NO;
         } else {
-            if (value) {
-                [self.localData setObject:value forKey:key];
-            } else {
-                [self.localData removeObjectForKey:key];
-            }
+            [self internalSyncLock:^{
+                if (value) {
+                    [self->_localData setObject:value forKey:key];
+                } else {
+                    [self->_localData removeObjectForKey:key];
+                }
+            }];
         }
     }
 }
@@ -366,8 +377,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     }
 
     if ([[AVObject invalidKeys] containsObject:key]) {
-        NSException *exception = [NSException exceptionWithName:kAVErrorDomain reason:[NSString stringWithFormat:@"The key '%@' is reserved.", key] userInfo:nil];
-        [exception raise];
+        [NSException raise:NSInvalidArgumentException format:@"The key '%@' is reserved.", key];
     }
     
     if (self.inSetter) {
@@ -378,13 +388,15 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 
 - (void)removeObjectForKey:(NSString *)key
 {
-    BOOL hasKey = NO;
-    for (NSMutableDictionary *dic in [self allArray]) {
-        if ([dic objectForKey:key]) {
-            hasKey = YES;
+    __block BOOL hasKey = NO;
+    [self internalSyncLock:^{
+        for (NSMutableDictionary *dic in @[self->_localData, self.estimatedData, self.relationData]) {
+            if ([dic objectForKey:key]) {
+                hasKey = YES;
+            }
+            [dic removeObjectForKey:key];
         }
-        [dic removeObjectForKey:key];
-    }
+    }];
     if ([AVUtils containsProperty:key inClass:[self class] containSuper:YES filterDynamic:YES]) {
         /* Create a clean object to produce an empty value. */
         [self setValue:[[[self class] alloc] valueForKey:key] forKey:key];
@@ -488,9 +500,12 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 }
 
 -(NSMutableArray *)createArrayForKey:(NSString *)key {
-    id object = [self.localData objectForKey:key];
+    __block id object = nil;
     NSMutableArray * array = [NSMutableArray array];
-    [self.localData setObject:array forKey:key];
+    [self internalSyncLock:^{
+        object = self->_localData[key];
+        self->_localData[key] = array;
+    }];
     if (object == nil) {
         return array;
     }
@@ -530,7 +545,10 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
             return NO;
         }
     }
-    NSMutableArray *array = [self findArrayForKey:key inDictionary:self.localData create:YES];
+    __block NSMutableArray *array = nil;
+    [self internalSyncLock:^{
+        array = [self findArrayForKey:key inDictionary:self->_localData create:YES];
+    }];
     if (unique && [array containsObject:object])
     {
         return NO;
@@ -576,7 +594,10 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 
 - (void)removeObject:(id)object forKey:(NSString *)key
 {
-    NSMutableArray * array = [self findArrayForKey:key inDictionary:self.localData create:NO];
+    __block NSMutableArray * array = nil;
+    [self internalSyncLock:^{
+        array = [self findArrayForKey:key inDictionary:self->_localData create:NO];
+    }];
     if (!array) {
         if ([AVUtils containsProperty:key inClass:[self class] containSuper:YES filterDynamic:YES]) {
             array = [self valueForKey:key];
@@ -614,12 +635,17 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 
 -(BOOL)moveToEstimated:(NSString *)key
 {
-    NSNumber * localNumber = [self.localData valueForKey:key];
+    __block NSNumber * localNumber = nil;
+    [self internalSyncLock:^{
+        localNumber = self->_localData[key];
+    }];
     NSNumber * estimatedNumber = [self.estimatedData valueForKey:key];
     if (localNumber)
     {
         [self.estimatedData setValue:localNumber forKey:key];
-        [self.localData removeObjectForKey:key];
+        [self internalSyncLock:^{
+            [self->_localData removeObjectForKey:key];
+        }];
         return YES;
     }
     if (estimatedNumber)
@@ -651,8 +677,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 
 -(void)setACL:(AVACL *)ACL {
     if (ACL && ![ACL isKindOfClass:[AVACL class]]) {
-        NSException *exception = [NSException exceptionWithName:kAVErrorDomain reason:[NSString stringWithFormat:@"An instance of AVACL is required for property 'ACL'."] userInfo:nil];
-        [exception raise];
+        [NSException raise:NSInvalidArgumentException format:@"An instance of AVACL is required for property 'ACL'."];
     }
 
     _ACL = ACL;
@@ -776,7 +801,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     NSString *queryClassName = query.className;
 
     if (queryClassName && ![queryClassName isEqualToString:self.className]) {
-        error = [AVErrorUtils errorWithCode:kAVErrorInvalidClassName errorText:@"Invalid query class name."];
+        error = LCError(kAVErrorInvalidClassName, @"Invalid query class name.", nil);
     }
 
     return error;
@@ -1006,9 +1031,12 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     if ([internalId isEqualToString:self.uuid]) {
         return self;
     }
-    NSDictionary *localData = [self.localData copy];
-    for (id key in localData) {
-        id object = localData[key];
+    __block NSDictionary *localDataCopy = nil;
+    [self internalSyncLock:^{
+        localDataCopy = self->_localData.copy;
+    }];
+    for (id key in localDataCopy) {
+        id object = localDataCopy[key];
         if ([object isKindOfClass:[AVObject class]]) {
             if ([visitedObjects containsObject:object]) {
                 continue;
@@ -1042,7 +1070,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     __block NSError *blockError;
     [[AVPaasClient sharedInstance] postBatchSaveObject:batchRequest headerMap:[self headerMap] eventually:isEventually block:^(id object, NSError *error) {
         [self copyByUUIDFromDictionary:object];
-        if(![error.domain isEqualToString:kAVErrorDomain]) {
+        if(![error.domain isEqualToString:kLeanCloudErrorDomain]) {
             [self postSave];
         }
         if (error) {
@@ -1058,10 +1086,12 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 }
 
 - (void)iterateLocalDataWithBlock:(void(^)(NSString *key, id object))block {
-    NSDictionary *localData = [self.localData copy];
-
-    for (NSString *key in localData) {
-        block(key, localData[key]);
+    __block NSDictionary *localDataCopy = nil;
+    [self internalSyncLock:^{
+        localDataCopy = self->_localData.copy;
+    }];
+    for (NSString *key in localDataCopy) {
+        block(key, localDataCopy[key]);
     }
 }
 
@@ -1524,7 +1554,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     if ([object allKeys].count <= 0) {
         // 返回 {}
         if (error != NULL) {
-            *error = [AVErrorUtils errorWithCode:kAVErrorObjectNotFound errorText:@"not found the object to fetch"];
+            *error = LCError(kAVErrorObjectNotFound, @"not found the object to fetch", nil);
         }
     } else {
         [self removeLocalData];
@@ -1540,7 +1570,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 {
     
     if (![self hasValidObjectId]) {
-        NSError *error = [AVErrorUtils errorWithCode:kAVErrorMissingObjectId errorText:@"Missing ObjectId"];
+        NSError *error = LCError(kAVErrorMissingObjectId, @"Missing ObjectId", nil);
         [AVUtils callObjectResultBlock:resultBlock object:nil error:error];
         return;
     }
@@ -1786,7 +1816,7 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
     for(AVObject * object in [objects copy]) {
         if (object.className.length <= 0 || ![object hasValidObjectId]) {
             if (error != NULL)
-            *error = [AVErrorUtils errorWithCode:kAVErrorMissingObjectId errorText:@"Invaid className or objectId"];
+                *error = LCError(kAVErrorMissingObjectId, @"Invaid className or objectId", nil);
             return NO;
         }
     }
@@ -2074,7 +2104,9 @@ BOOL requests_contain_request(NSArray *requests, NSDictionary *request) {
 #pragma mark -
 
 -(void)removeLocalData {
-    [self.localData removeAllObjects];
+    [self internalSyncLock:^{
+        [self->_localData removeAllObjects];
+    }];
     [self.relationData removeAllObjects];
     [self.estimatedData removeAllObjects];
     [self.requestManager clear];

@@ -1,1 +1,1 @@
-../../../AVOSCloudIM/AVOS/AVOSCloudIM/AVIMConversation_Internal.h
+../../../AVOSCloudIM/AVOS/AVOSCloudIM/Conversation/AVIMConversation_Internal.h

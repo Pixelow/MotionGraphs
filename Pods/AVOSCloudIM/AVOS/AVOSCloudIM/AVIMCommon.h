@@ -15,8 +15,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *AVOSCloudIMErrorDomain;
-
 typedef NS_ENUM(NSInteger, AVIMErrorCode) {
     kAVIMErrorTimeout = 9000,
     kAVIMErrorConnectionLost,

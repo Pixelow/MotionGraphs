@@ -1,1 +1,1 @@
-../../../AVOSCloudIM/AVOS/AVOSCloudIM/AVIMClient.h
+../../../AVOSCloudIM/AVOS/AVOSCloudIM/Client/AVIMClient.h

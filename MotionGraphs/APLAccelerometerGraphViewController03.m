@@ -29,6 +29,13 @@
 
 #define UBIQUITY_CONTAINER_URL @"iCloud.com.saitama.MotionGraphs"
 
+#define GROUPCONTROL_CLASSNAME @"SeismologicalBureau_GroupControl"
+#define FORCEREMOTESTART_CLASSNAME @"SeismologicalBureau_ForceRemoteStart"
+#define FORCEREMOTESTOP_CLASSNAME @"SeismologicalBureau_ForceRemoteStop"
+#define REMOTESTART_CLASSNAME @"SeismologicalBureau_RemoteStart"
+#define REMOTESTOP_CLASSNAME @"SeismologicalBureau_RemoteStop"
+#define TRIGGERED_CLASSNAME @"SeismologicalBureau_Triggered"
+
 #define RGB_Alpha(r, g, b, alp) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: alp]
 #define RGB(r, g, b) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: 1]
 
@@ -269,12 +276,12 @@
     NSString *deviceType = [self getDeviceName];
     NSString *device = [NSString stringWithFormat:@"%@'s %@", deviceName, deviceType];
     
-    AVQuery *doingQuery = [AVQuery queryWithClassName:@"GroupControl"];
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
     [doingQuery whereKey:@"device" equalTo:device];
     [doingQuery findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
         /* Doing list did fetch. */
         if (![objects count]) {
-            AVObject *groupControl = [AVObject objectWithClassName:@"GroupControl"];
+            AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME];
             groupControl[@"state"] = @"Local";
             groupControl[@"device"] = device;
             [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
@@ -288,7 +295,7 @@
             for (AVObject *obj in objects) {
                 self.objectId = obj[@"objectId"];
             }
-            AVObject *groupControl = [AVObject objectWithClassName:@"GroupControl" objectId:self.objectId];
+            AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
             groupControl[@"state"] = @"Local";
             [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
                 /* Saved. */
@@ -299,7 +306,7 @@
 }
 
 - (void)updateTableView {
-    AVQuery *doingQuery = [AVQuery queryWithClassName:@"GroupControl"];
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
     [doingQuery findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
         /* Doing list did fetch. */
         if ([objects count]) {
@@ -310,7 +317,7 @@
 }
 
 - (void)liveQueryObserver {
-    AVQuery *doingQuery = [AVQuery queryWithClassName:@"GroupControl"];
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
     self.doingLiveQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.doingLiveQuery.delegate = self;
     [self.doingLiveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -566,7 +573,7 @@
         [self loadQueryUpdate];
         
         //liveQuery
-        AVObject *groupControl = [AVObject objectWithClassName:@"GroupControl" objectId:self.objectId];
+        AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
         groupControl[@"state"] = @"Remote";
         [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             /* Saved. */
@@ -583,7 +590,7 @@
         [self stopQueryUpdate];
         
         //liveQuery
-        AVObject *groupControl = [AVObject objectWithClassName:@"GroupControl" objectId:self.objectId];
+        AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
         groupControl[@"state"] = @"Local";
         [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
             /* Saved. */
@@ -689,7 +696,7 @@
 //    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
     // LiveQuery
-    AVObject *groupControl = [AVObject objectWithClassName:@"ForceRemoteStart"];
+    AVObject *groupControl = [AVObject objectWithClassName:FORCEREMOTESTART_CLASSNAME];
     [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         /* Saved. */
     }];
@@ -710,7 +717,7 @@
 //    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
     // LiveQuery
-    AVObject *groupControl = [AVObject objectWithClassName:@"ForceRemoteStop"];
+    AVObject *groupControl = [AVObject objectWithClassName:FORCEREMOTESTOP_CLASSNAME];
     [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         /* Saved. */
     }];
@@ -731,7 +738,7 @@
 //    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
     // LiveQuery
-    AVObject *groupControl = [AVObject objectWithClassName:@"RemoteStart"];
+    AVObject *groupControl = [AVObject objectWithClassName:REMOTESTART_CLASSNAME];
     [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         /* Saved. */
     }];
@@ -752,7 +759,7 @@
 //    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
     // LiveQuery
-    AVObject *groupControl = [AVObject objectWithClassName:@"RemoteStop"];
+    AVObject *groupControl = [AVObject objectWithClassName:REMOTESTOP_CLASSNAME];
     [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         /* Saved. */
     }];
@@ -773,7 +780,7 @@
 //    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
     // LiveQuery
-    AVObject *groupControl = [AVObject objectWithClassName:@"Triggered"];
+    AVObject *groupControl = [AVObject objectWithClassName:TRIGGERED_CLASSNAME];
     [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
         /* Saved. */
     }];
@@ -1442,7 +1449,7 @@
 //                                         NSMetadataItemFSNameKey, remoteStartFilePattern]];
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStartQuery];
-    AVQuery *doingQuery = [AVQuery queryWithClassName:@"RemoteStart"];
+    AVQuery *doingQuery = [AVQuery queryWithClassName:REMOTESTART_CLASSNAME];
     self.remoteStartQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.remoteStartQuery.delegate = self;
     [self.remoteStartQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -1458,7 +1465,7 @@
 //                                         NSMetadataItemFSNameKey, remoteStopFilePattern]];
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStopQuery];
-    doingQuery = [AVQuery queryWithClassName:@"RemoteStop"];
+    doingQuery = [AVQuery queryWithClassName:REMOTESTOP_CLASSNAME];
     self.remoteStopQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.remoteStopQuery.delegate = self;
     [self.remoteStopQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -1474,7 +1481,7 @@
 //                                        NSMetadataItemFSNameKey, forceRemoteStartFilePattern]];
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStartQuery];
-    doingQuery = [AVQuery queryWithClassName:@"ForceRemoteStart"];
+    doingQuery = [AVQuery queryWithClassName:FORCEREMOTESTART_CLASSNAME];
     self.forceRemoteStartQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.forceRemoteStartQuery.delegate = self;
     [self.forceRemoteStartQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -1491,7 +1498,7 @@
 //                                              NSMetadataItemFSNameKey, forceRemoteStopFilePattern]];
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStopQuery];
-    doingQuery = [AVQuery queryWithClassName:@"ForceRemoteStop"];
+    doingQuery = [AVQuery queryWithClassName:FORCEREMOTESTOP_CLASSNAME];
     self.forceRemoteStopQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.forceRemoteStopQuery.delegate = self;
     [self.forceRemoteStopQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -1507,7 +1514,7 @@
 //                                             NSMetadataItemFSNameKey, triggeredInfoFilePattern]];
 //
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(triggeredInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.triggeredInfoQuery];
-    doingQuery = [AVQuery queryWithClassName:@"Triggered"];
+    doingQuery = [AVQuery queryWithClassName:TRIGGERED_CLASSNAME];
     self.triggeredInfoQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
     self.triggeredInfoQuery.delegate = self;
     [self.triggeredInfoQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
@@ -1733,7 +1740,6 @@
 // 获取设备型号然后手动转化为对应名称
 - (NSString *)getDeviceName
 {
-#warning 题主呕心沥血总结！！最全面！亲测！全网独此一份！！
     struct utsname systemInfo;
     uname(&systemInfo);
     NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
@@ -1753,7 +1759,7 @@
     if ([deviceString isEqualToString:@"iPhone8,1"])    return @"iPhone 6s";
     if ([deviceString isEqualToString:@"iPhone8,2"])    return @"iPhone 6s Plus";
     if ([deviceString isEqualToString:@"iPhone8,4"])    return @"iPhone SE";
-    // 日行两款手机型号均为日本独占，可能使用索尼FeliCa支付方案而不是苹果支付
+
     if ([deviceString isEqualToString:@"iPhone9,1"])    return @"国行、日版、港行iPhone 7";
     if ([deviceString isEqualToString:@"iPhone9,2"])    return @"港行、国行iPhone 7 Plus";
     if ([deviceString isEqualToString:@"iPhone9,3"])    return @"美版、台版iPhone 7";

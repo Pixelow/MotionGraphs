@@ -510,7 +510,6 @@
 				28DDC9A115F858BB00570985 /* Sources */,
 				28DDC9A215F858BB00570985 /* Frameworks */,
 				28DDC9A315F858BB00570985 /* Resources */,
-				6E5ADD4C164119CA0D5A53B7 /* [CP] Embed Pods Frameworks */,
 				6320A397C91A980A771F9159 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -665,21 +664,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MotionGraphs/Pods-MotionGraphs-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6E5ADD4C164119CA0D5A53B7 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MotionGraphs/Pods-MotionGraphs-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

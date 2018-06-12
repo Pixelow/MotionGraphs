@@ -24,8 +24,6 @@
 + (AVUser *)userOrSubclassUser;
 
 + (NSString *)userTag;
-+ (BOOL)isAutomaticUserEnabled;
-+ (void)disableAutomaticUser;
 
 + (NSString *)endPoint;
 - (NSString *)internalClassName;
@@ -35,20 +33,5 @@
 
 + (void)configAndChangeCurrentUserWithUser:(AVUser *)user
                                     object:(id)object;
-
-+ (void)loginOrSignUpWithAuthData:(NSDictionary *)authData
-                             user:(AVUser *)user
-                         platform:(NSString *)platform
-                            queue:(dispatch_queue_t)queue
-                            block:(AVUserResultBlock)block;
-
-- (void)associateWithAuthData:(NSDictionary *)authData
-                     platform:(NSString *)platform
-                        queue:(dispatch_queue_t)queue
-                        block:(AVUserResultBlock)block;
-
-- (void)disassociateWithPlatform:(NSString *)platform
-                           queue:(dispatch_queue_t)queue
-                           block:(AVUserResultBlock)block;
 
 @end

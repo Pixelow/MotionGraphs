@@ -17,19 +17,17 @@
 #import "AVFriendQuery.h"
 #import "AVUtils.h"
 
-NSString *const LeanCloudSocialPlatformWeiBo  = @"weibo";
-NSString *const LeanCloudSocialPlatformQQ     = @"qq";
-NSString *const LeanCloudSocialPlatformWeiXin = @"weixin";
+LeanCloudSocialPlatform LeanCloudSocialPlatformWeiBo  = @"weibo";
+LeanCloudSocialPlatform LeanCloudSocialPlatformQQ     = @"qq";
+LeanCloudSocialPlatform LeanCloudSocialPlatformWeiXin = @"weixin";
 
 static BOOL enableAutomatic = NO;
 
-static BOOL is_sync_callback(dispatch_queue_t queue)
-{
-    BOOL isMainQueue = (dispatch_get_main_queue() == queue);
-    return (isMainQueue && NSThread.isMainThread);
-}
-
 @class AVQuery;
+
+@implementation AVUserAuthDataLoginOption
+
+@end
 
 @implementation  AVUser
 
@@ -54,8 +52,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     return [AVUser userTag];
 }
 
-+(void)changeCurrentUser:(AVUser *)newUser
-                    save:(BOOL)save
++ (void)changeCurrentUser:(AVUser *)newUser save:(BOOL)save
 {
     if (newUser && save) {
         NSMutableDictionary * json = [newUser userDictionaryForCache];
@@ -72,45 +69,36 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
 
 + (instancetype)currentUser
 {
-    AVUser * u = [AVPaasClient sharedInstance].currentUser;
-    if (u) {
-        return u;
+    AVUser *user = [AVPaasClient sharedInstance].currentUser;
+    if (user) {
+        return user;
     } else if ([AVPersistenceUtils fileExist:[AVPersistenceUtils currentUserArchivePath]]) {
         NSMutableDictionary *userDict = [NSMutableDictionary dictionaryWithDictionary:[AVPersistenceUtils getJSONFromPath:[AVPersistenceUtils currentUserArchivePath]]];
         if (userDict) {
             if ([AVPersistenceUtils fileExist:[AVPersistenceUtils currentUserClassArchivePath]]) {
                 NSDictionary *classDict = [AVPersistenceUtils getJSONFromPath:[AVPersistenceUtils currentUserClassArchivePath]];
-                u = [NSClassFromString(classDict[@"class"]) user];
+                user = [NSClassFromString(classDict[@"class"]) user];
             } else {
-                u = [self userOrSubclassUser];
+                user = [self userOrSubclassUser];
             }
             
-            [AVObjectUtils copyDictionary:userDict toObject:u];
-            [AVPaasClient sharedInstance].currentUser = u;
-            return u;
+            [AVObjectUtils copyDictionary:userDict toObject:user];
+            [AVPaasClient sharedInstance].currentUser = user;
+            return user;
         }
     }
     if (!enableAutomatic) {
-        return u;
+        return user;
     }
     
-    AVUser *user = [self userOrSubclassUser];
-    [[self class] changeCurrentUser:user save:NO];
-    return user;
+    AVUser *newUser = [self userOrSubclassUser];
+    [[self class] changeCurrentUser:newUser save:NO];
+    return newUser;
 }
 
 - (void)isAuthenticatedWithSessionToken:(NSString *)sessionToken callback:(AVBooleanResultBlock)callback {
     if (sessionToken == nil) {
-        NSInteger code = 0;
-        NSString *errorReasonText = @"sessionToken is nil";
-        NSDictionary *errorInfo = @{
-                                    @"code" : @(code),
-                                    NSLocalizedDescriptionKey : errorReasonText,
-                                    };
-        NSError *error = [NSError errorWithDomain:kAVErrorDomain
-                                             code:code
-                                         userInfo:errorInfo];
-        [AVUtils callBooleanResultBlock:callback error:error];
+        [AVUtils callBooleanResultBlock:callback error:LCErrorInternal(@"sessionToken is nil")];
         return;
     }
     
@@ -157,7 +145,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     {
         return nil;
     }
-    return [AVErrorUtils errorWithCode:kAVErrorUserCannotBeAlteredWithoutSession];
+    return LCError(kAVErrorUserCannotBeAlteredWithoutSession, nil, nil);
 }
 
 -(void)postSave
@@ -330,11 +318,11 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     } else {
         NSError *error = nil;
         if (!self.isAuthDataExistInMemory) {
-            error= [AVErrorUtils errorWithCode:kAVErrorUserCannotBeAlteredWithoutSession];
+            error = LCError(kAVErrorUserCannotBeAlteredWithoutSession, nil, nil);
         }
         
         if (!(oldPassword && newPassword)) {
-            error = [AVErrorUtils errorWithCode:kAVErrorUserPasswordMissing];
+            error = LCError(kAVErrorUserPasswordMissing, nil, nil);
         }
         [AVUtils callIdResultBlock:block object:nil error:error];
     }
@@ -344,7 +332,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     NSString *objectId = self.objectId;
 
     if (!objectId) {
-        NSError *error = [AVErrorUtils errorWithCode:kAVErrorUserNotFound errorText:@"User ID not found."];
+        NSError *error = LCError(kAVErrorUserNotFound, @"User ID not found.", nil);
         [AVUtils callBooleanResultBlock:block error:error];
         return;
     }
@@ -352,7 +340,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     NSString *sessionToken = self.sessionToken;
 
     if (!sessionToken) {
-        NSError *error = [AVErrorUtils errorWithCode:kAVErrorUserCannotBeAlteredWithoutSession errorText:@"User session token not found."];
+        NSError *error = LCError(kAVErrorUserCannotBeAlteredWithoutSession, @"User session token not found.", nil);
         [AVUtils callBooleanResultBlock:block error:error];
         return;
     }
@@ -579,17 +567,8 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
 
 + (void)internalBecomeWithSessionTokenInBackground:(NSString *)sessionToken block:(AVUserResultBlock)block {
     if (sessionToken == nil) {
-        NSInteger code = 0;
-        NSString *errorReasonText = @"sessionToken is nil";
-        NSDictionary *errorInfo = @{
-                                    @"code" : @(code),
-                                    NSLocalizedDescriptionKey : errorReasonText,
-                                    };
-        NSError *error = [NSError errorWithDomain:kAVErrorDomain
-                                             code:code
-                                         userInfo:errorInfo];
         if (block) {
-            block(nil, error);
+            block(nil, LCErrorInternal(@"sessionToken is nil"));
         }
         return;
     }
@@ -919,347 +898,299 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
     return query;
 }
 
-// MARK: - SNS
+// MARK: - Auth Data
 
-+ (void)loginOrSignUpWithAuthData:(NSDictionary *)authData
-                         platform:(NSString *)platform
-                            block:(AVUserResultBlock)block
+- (void)loginWithAuthData:(NSDictionary *)authData
+               platformId:(NSString *)platformId
+                  options:(AVUserAuthDataLoginOption * _Nullable)options
+                 callback:(void (^)(BOOL, NSError * _Nullable))callback
 {
-    [self loginOrSignUpWithAuthData:authData
-                               user:nil
-                           platform:platform
-                              queue:dispatch_get_main_queue()
-                              block:block];
-}
-
-- (void)associateWithAuthData:(NSDictionary *)authData
-                     platform:(NSString *)platform
-                        block:(AVUserResultBlock)block
-{
-    [self associateWithAuthData:authData
-                       platform:platform
-                          queue:dispatch_get_main_queue()
-                          block:block];
-}
-
-- (void)disassociateWithPlatform:(NSString *)platform
-                           block:(AVUserResultBlock)block
-{
-    [self disassociateWithPlatform:platform
-                             queue:dispatch_get_main_queue()
-                             block:block];
-}
-
-+ (void)loginOrSignUpWithAuthData:(NSDictionary *)authData
-                             user:(AVUser *)user
-                         platform:(NSString *)platform
-                            queue:(dispatch_queue_t)queue
-                            block:(AVUserResultBlock)block
-{
-    void (^callbackInQueue)(AVUser *, NSError *) = ^(AVUser *cbUser, NSError *cbError)
-    {
-        if (is_sync_callback(queue)) {
-            
-            block(cbUser, cbError);
-            
-        } else {
-            
-            dispatch_async(queue, ^{
-                
-                block(cbUser, cbError);
-            });
-        }
-    };
+    NSMutableDictionary *parameters = [self initialBodyData];
     
-    /* check `authData` */
-    
-    NSError *ckErr = nil;
-    
-    [self checkingAuthData:authData
-                  platform:platform
-                     error:&ckErr];
-    
-    if (ckErr) {
+    if (options) {
         
-        callbackInQueue(nil, ckErr);
+        parameters[authDataTag] =  @{ platformId : ({
+            NSMutableDictionary *mutableAuthData = authData.mutableCopy;
+            if (options.platform) {
+                mutableAuthData[@"platform"] = options.platform;
+            }
+            if (options.unionId) {
+                mutableAuthData[@"unionid"] = options.unionId;
+            }
+            if (options.isMainAccount) {
+                mutableAuthData[@"main_account"] = @(options.isMainAccount);
+            }
+            mutableAuthData;
+        }) };
         
-        return;
+    } else {
+        
+        parameters[authDataTag] = @{ platformId : authData };
     }
     
-    /* POST */
+    NSString *path = ({
+        NSString *path = nil;
+        if (options && options.failOnNotExist) {
+            path = [NSString stringWithFormat:@"users?%@=%@", @"failOnNotExist", @"true"];
+        } else {
+            path = @"users";
+        }
+        path;
+    });
     
-    AVIdResultBlock callback = ^(id object, NSError *cbErr) {
+    [AVPaasClient.sharedInstance postObject:path withParameters:parameters block:^(id object, NSError *error) {
         
-        if (cbErr) {
+        if (error) {
             
-            callbackInQueue(nil, cbErr);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                callback(false, error);
+            });
             
             return;
         }
         
         NSDictionary *dic = (NSDictionary *)object;
         
-        AVUser *aUser = nil;
-        
-        if (user) {
+        if (![NSDictionary lc__checkingType:dic]) {
             
-            aUser = user;
-            
-        } else {
-            
-            aUser = [self userOrSubclassUser];
-        }
-        
-        if (dic[authDataTag] == nil) {
-            
-            [aUser setNewFlag:true]; // unnecessary?
-            
-            [aUser setObject:authData[authDataTag]
-                      forKey:authDataTag];
-        }
-        
-        [self configAndChangeCurrentUserWithUser:aUser
-                                          object:dic];
-        
-        callbackInQueue(aUser, nil);
-    };
-    
-    [AVPaasClient.sharedInstance postObject:@"users"
-                             withParameters:authData
-                                      block:callback];
-}
-
-- (void)associateWithAuthData:(NSDictionary *)authData
-                     platform:(NSString *)platform
-                        queue:(dispatch_queue_t)queue
-                        block:(AVUserResultBlock)block
-{
-    void (^callbackInQueue)(AVUser *, NSError *) = ^(AVUser *cbUser, NSError *cbError)
-    {
-        if (is_sync_callback(queue)) {
-            
-            block(cbUser, cbError);
-            
-        } else {
-            
-            dispatch_async(queue, ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
                 
-                block(cbUser, cbError);
+                callback(false, ({
+                    NSString *reason = @"response invalid.";
+                    LCErrorInternal(reason);
+                }));
             });
-        }
-    };
-    
-    if (self.objectId && self.sessionToken) { /* check the user if registered */
-        
-        /* check `authData` */
-        
-        NSError *ckErr = nil;
-        
-        [self.class checkingAuthData:authData
-                            platform:platform
-                               error:&ckErr];
-        
-        if (ckErr) {
-            
-            callbackInQueue(nil, ckErr);
             
             return;
         }
         
-        /* POST */
+        [self setNewFlag:true];
+        [AVObjectUtils copyDictionary:dic toObject:self];
+        [self.requestManager clear];
+        [AVUser changeCurrentUser:self save:YES];
         
-        AVIdResultBlock callback = ^(id object, NSError *cbErr) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (cbErr) {
-                
-                callbackInQueue(nil, cbErr);
-                
-                return;
+            callback(true, nil);
+        });
+    }];
+}
+
+- (void)associateWithAuthData:(NSDictionary *)authData
+                   platformId:(NSString *)platformId
+                      options:(AVUserAuthDataLoginOption * _Nullable)options
+                     callback:(void (^)(BOOL, NSError * _Nullable))callback
+{
+    NSString *objectId = self.objectId;
+    
+    if (!objectId) {
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSError *aError = ({
+                NSString *reason = @"objectId invalid.";
+                LCErrorInternal(reason);
+            });
+            
+            callback(false, aError);
+        });
+        
+        return;
+    }
+    
+    NSDictionary *parameters = nil;
+    
+    if (options) {
+        
+        NSMutableDictionary *mutableAuthData = ({
+            NSMutableDictionary *mutableAuthData = authData.mutableCopy;
+            if (options.platform) {
+                mutableAuthData[@"platform"] = options.platform;
             }
-            
-            [self setObject:authData[authDataTag]
-                     forKey:authDataTag];
-            
-            [self.class configAndChangeCurrentUserWithUser:self
-                                                    object:@{}];
-            
-            callbackInQueue(self, nil);
-        };
+            if (options.unionId) {
+                mutableAuthData[@"unionid"] = options.unionId;
+            }
+            if (options.isMainAccount) {
+                mutableAuthData[@"main_account"] = @(options.isMainAccount);
+            }
+            mutableAuthData;
+        });
         
-        NSString *path = [NSString stringWithFormat:@"users/%@", self.objectId];
-        
-        [AVPaasClient.sharedInstance putObject:path
-                                withParameters:authData
-                                  sessionToken:self.sessionToken
-                                         block:callback];
+        parameters =  @{ authDataTag :
+                            @{ platformId : mutableAuthData } };
         
     } else {
         
-        /* register the user */
-        
-        [self.class loginOrSignUpWithAuthData:authData
-                                         user:self
-                                     platform:platform
-                                        queue:queue
-                                        block:block];
+        parameters =  @{ authDataTag :
+                            @{ platformId : authData } };
     }
-}
-
-- (void)disassociateWithPlatform:(NSString *)platform
-                           queue:(dispatch_queue_t)queue
-                           block:(AVUserResultBlock)block
-{
-    void (^callbackInQueue)(AVUser *, NSError *) = ^(AVUser *cbUser, NSError *cbError)
-    {
-        if (is_sync_callback(queue)) {
+    
+    NSString *path = [NSString stringWithFormat:@"users/%@", objectId];
+    NSString *sessionToken = self.sessionToken;
+    
+    [AVPaasClient.sharedInstance putObject:path withParameters:parameters sessionToken:sessionToken block:^(id object, NSError *error) {
+        
+        if (error) {
             
-            block(cbUser, cbError);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                callback(false, error);
+            });
+            
+            return;
+        }
+        
+        NSDictionary *dic = (NSDictionary *)object;
+        
+        if (![NSDictionary lc__checkingType:dic]) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                callback(false, ({
+                    NSString *reason = @"response invalid.";
+                    LCErrorInternal(reason);
+                }));
+            });
+            
+            return;
+        }
+        
+        [AVObjectUtils copyDictionary:dic toObject:self];
+        
+        NSDictionary *oldAuthData = [self objectForKey:authDataTag];
+        NSDictionary *newAuthData = parameters[authDataTag];
+        
+        if ([NSDictionary lc__checkingType:oldAuthData]) {
+            
+            NSMutableDictionary *mutableCopy = oldAuthData.mutableCopy;
+            [mutableCopy addEntriesFromDictionary:newAuthData];
+            [self setObject:mutableCopy forKey:authDataTag];
             
         } else {
             
-            dispatch_async(queue, ^{
-                
-                block(cbUser, cbError);
-            });
+            [self setObject:newAuthData forKey:authDataTag];
         }
-    };
-    
-    if (self.objectId && self.sessionToken) { /* check the user if registered */
         
-        /* generate `authData` */
+        [AVUser changeCurrentUser:self save:YES];
         
-        NSMutableDictionary *platformDic = @{ platform : @"" }.mutableCopy;
-        
-        platformDic[platform] = nil;
-        
-        NSDictionary *authData = @{ authDataTag : platformDic };
-        
-        /* POST */
-        
-        AVIdResultBlock callback = ^(id object, NSError *cbErr) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (cbErr) {
-                
-                callbackInQueue(nil, cbErr);
-                
-                return;
-            }
-            
-            NSMutableDictionary *authDataValue = ((NSDictionary *)[self objectForKey:authDataTag]).mutableCopy;
-            
-            authDataValue[platform] = nil;
-            
-            [self setObject:authDataValue forKey:authDataTag];
-            
-            [self.class configAndChangeCurrentUserWithUser:self
-                                                    object:@{}];
-            
-            callbackInQueue(self, nil);
-        };
-        
-        NSString *path = [NSString stringWithFormat:@"users/%@", self.objectId];
-        
-        [AVPaasClient.sharedInstance putObject:path
-                                withParameters:authData
-                                  sessionToken:self.sessionToken
-                                         block:callback];
-        
-    } else {
-        
-        NSString *reason = @"The user which call the method is not valid.";
-        
-        NSDictionary *info = @{ @"reason" : reason };
-        
-        NSError *err = [NSError errorWithDomain:kAVErrorDomain
-                                           code:kAVErrorUserNotFound
-                                       userInfo:info];
-        
-        callbackInQueue(nil, err);
-    }
+            callback(true, nil);
+        });
+    }];
 }
 
-+ (void)checkingAuthData:(NSDictionary *)authData
-                platform:(NSString *)platform
-                   error:(NSError * __autoreleasing *)error
+- (void)disassociateWithPlatformId:(NSString *)platformId
+                    callback:(void (^)(BOOL, NSError * _Nullable))callback
 {
-    /* do not call me */
+    NSString *objectId = self.objectId;
     
-    NSError *(^newErrBlock)(NSString *) = ^NSError *(NSString *key) {
+    if (!objectId) {
         
-        NSString *reason = [NSString stringWithFormat:@"The value for key('%@') is not a valid type", key];
-        
-        NSDictionary *info = @{ @"reason" : reason };
-        
-        NSError *err = [NSError errorWithDomain:kAVErrorDomain
-                                           code:kAVErrorUserSNSAuthDataInvalid
-                                       userInfo:info];
-        
-        return err;
-    };
-    
-    /* check value for key('authData') */
-    
-    NSDictionary *authDataValue = authData[authDataTag];
-    
-    if (!authDataValue || [authDataValue isKindOfClass:[NSDictionary class]] == false) {
-        
-        *error = newErrBlock(authDataTag);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            NSError *aError = ({
+                NSString *reason = @"objectId invalid.";
+                LCErrorInternal(reason);
+            });
+            
+            callback(nil, aError);
+        });
         
         return;
     }
     
-    /* check value for key('platform') */
+    NSDictionary *parameters = @{ [NSString stringWithFormat:@"%@.%@", authDataTag, platformId] :
+                                      @{ @"__op" : @"Delete" } };
     
-    NSDictionary *platformValue = authDataValue[platform];
+    NSString *path = [NSString stringWithFormat:@"users/%@", self.objectId];
+    NSString *sessionToken = self.sessionToken;
     
-    if (!platformValue || [platformValue isKindOfClass:[NSDictionary class]] == false) {
+    [AVPaasClient.sharedInstance putObject:path withParameters:parameters sessionToken:sessionToken block:^(id object, NSError *error) {
         
-        *error = newErrBlock(platform);
+        if (error) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                callback(nil, error);
+            });
+            
+            return;
+        }
         
-        return;
-    }
-    
-    /* check value for key('unique id') */
-    
-    NSString *just_id_key = nil;
-    
-    if ([LeanCloudSocialPlatformWeiBo isEqualToString:platform]) {
+        NSDictionary *dic = (NSDictionary *)object;
         
-        just_id_key = @"uid";
+        if (![NSDictionary lc__checkingType:dic]) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                
+                callback(nil, ({
+                    NSString *reason = @"response invalid.";
+                    LCErrorInternal(reason);
+                }));
+            });
+            
+            return;
+        }
         
-    } else if ([LeanCloudSocialPlatformQQ isEqualToString:platform]) {
+        [AVObjectUtils copyDictionary:dic toObject:self];
         
-        just_id_key = @"openid";
+        NSDictionary *oldAuthData = [self objectForKey:authDataTag];
         
-    } else if ([LeanCloudSocialPlatformWeiXin isEqualToString:platform]) {
+        if ([NSDictionary lc__checkingType:oldAuthData]) {
+            
+            NSMutableDictionary *mutableCopy = oldAuthData.mutableCopy;
+            [mutableCopy removeObjectForKey:platformId];
+            [self setObject:mutableCopy forKey:authDataTag];
+        }
         
-        just_id_key = @"openid";
+        [AVUser changeCurrentUser:self save:YES];
         
-    } else {
-        
-        just_id_key = @"uid";
-        
-    }
-    
-    NSString *just_id = platformValue[just_id_key];
-    
-    if (!just_id || [just_id isKindOfClass:[NSString class]] == false) {
-        
-        *error = newErrBlock(just_id_key);
-        
-        return;
-    }
-    
-    /* check value for key('accessToken') */
-    
-    NSString *access_token = platformValue[@"access_token"];
-    
-    if (!access_token || [access_token isKindOfClass:[NSString class]] == false) {
-        
-        *error = newErrBlock(@"access_token");
-        
-        return;
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            callback(self, nil);
+        });
+    }];
+}
+
++ (void)loginOrSignUpWithAuthData:(NSDictionary *)authData
+                         platform:(NSString *)platform
+                            block:(AVUserResultBlock)block
+{
+    AVUser *user = [self user];
+    [user loginWithAuthData:authData[authDataTag][platform] platformId:platform options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            block(nil, error);
+        } else {
+            block(user, nil);
+        }
+    }];
+}
+
+- (void)associateWithAuthData:(NSDictionary *)authData
+                     platform:(NSString *)platform
+                        block:(AVUserResultBlock)block
+{
+    [self associateWithAuthData:authData[authDataTag][platform] platformId:platform options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            block(nil, error);
+        } else {
+            block(self, nil);
+        }
+    }];
+}
+
+- (void)disassociateWithPlatform:(NSString *)platform
+                           block:(AVUserResultBlock)block
+{
+    [self disassociateWithPlatformId:platform callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (error) {
+            block(nil, error);
+        } else {
+            block(self, nil);
+        }
+    }];
 }
 
 #pragma mark - Override from AVObject
@@ -1268,12 +1199,18 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
  Avoid session token to be removed after fetching or refreshing.
  */
 - (void)removeLocalData {
-    NSString *sessionToken = self.localData[@"sessionToken"];
+    __block NSString *sessionToken = nil;
+    [self internalSyncLock:^{
+        sessionToken = self.localData[@"sessionToken"];
+    }];
 
     [super removeLocalData];
 
-    if (sessionToken)
-        self.localData[@"sessionToken"] = sessionToken;
+    if (sessionToken) {
+        [self internalSyncLock:^{
+            self.localData[@"sessionToken"] = sessionToken;
+        }];
+    }
 }
 
 -(NSMutableDictionary *)postData
@@ -1300,16 +1237,6 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
 +(NSString *)endPoint
 {
     return @"users";
-}
-
-+(BOOL)isAutomaticUserEnabled
-{
-    return enableAutomatic;
-}
-
-+(void)disableAutomaticUser
-{
-    enableAutomatic = NO;
 }
 
 + (AVUser *)userOrSubclassUser {
@@ -1403,8 +1330,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
 
 -(void)follow:(NSString*)userId userDictionary:(NSDictionary *)dictionary andCallback:(AVBooleanResultBlock)callback{
     if (![self isAuthDataExistInMemory]) {
-        NSError *error= [AVErrorUtils errorWithCode:kAVErrorUserCannotBeAlteredWithoutSession];
-        callback(NO,error);
+        callback(NO, LCError(kAVErrorUserCannotBeAlteredWithoutSession, nil, nil));
         return;
     }
     NSDictionary *dict = [AVObjectUtils dictionaryFromObject:dictionary];
@@ -1417,8 +1343,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
 
 -(void)unfollow:(NSString *)userId andCallback:(AVBooleanResultBlock)callback{
     if (![self isAuthDataExistInMemory]) {
-        NSError *error= [AVErrorUtils errorWithCode:kAVErrorUserCannotBeAlteredWithoutSession];
-        callback(NO,error);
+        callback(NO, LCError(kAVErrorUserCannotBeAlteredWithoutSession, nil, nil));
         return;
     }
     
@@ -1464,7 +1389,7 @@ static BOOL is_sync_callback(dispatch_queue_t queue)
                 
             }
             @catch (NSException *exception) {
-                error=[AVErrorUtils errorWithCode:kAVErrorInternalServer errorText:@"wrong format return"];
+                error = LCErrorInternal(@"wrong format return");
             }
             @finally {
                 [AVUtils callIdResultBlock:callback object:dict error:error];
