@@ -7,9 +7,9 @@
 //
 
 #import "AVIMAvailability.h"
-
 #import "AVIMCommon.h"
 #import "AVIMSignature.h"
+#import "AVConstants.h"
 
 @class AVIMConversation;
 @class AVIMKeyedConversation;
@@ -35,7 +35,7 @@ typedef NS_ENUM(NSUInteger, AVIMClientStatus) {
      2. Closing Client but received an Error
      
      */
-    AVIMClientStatusNone,
+    AVIMClientStatusNone = 0,
     
     /*
      Client is Opening
@@ -116,12 +116,12 @@ typedef NS_OPTIONS(uint64_t, AVIMConversationOption) {
     /*
      Default conversation. At most allow 500 people to join the conversation.
      */
-    AVIMConversationOptionNone      = 0,
+    AVIMConversationOptionNone = 0,
     
     /*
      Unique conversation. If the server detects the conversation with that members exists, will return it instead of creating a new one.
      */
-    AVIMConversationOptionUnique    = 1 << 0,
+    AVIMConversationOptionUnique = 1 << 0,
     
     /*
      Transient conversation. No headcount limits. But the functionality is limited. No offline messages, no offline notifications, etc.
@@ -131,7 +131,7 @@ typedef NS_OPTIONS(uint64_t, AVIMConversationOption) {
     /*
      Temporary conversation
      */
-    AVIMConversationOptionTemporary = 1 << 2
+    AVIMConversationOptionTemporary = 1 << 2,
     
 };
 
@@ -217,8 +217,7 @@ typedef NS_OPTIONS(uint64_t, AVIMConversationOption) {
  @param clientId Identifie of this Client.
  @return Instance.
  */
-- (instancetype)initWithClientId:(NSString *)clientId
-__attribute__((warn_unused_result));
+- (instancetype)initWithClientId:(NSString *)clientId LC_WARN_UNUSED_RESULT;
 
 /**
  Initialization method.
@@ -227,8 +226,7 @@ __attribute__((warn_unused_result));
  @param tag You can use 'Tag' to implement the feature that the same 'clientId' only used in single device. 'Tag' Can't set with "default", it's a reserved tag.
  @return Instance.
  */
-- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag
-__attribute__((warn_unused_result));
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag LC_WARN_UNUSED_RESULT;
 
 /**
  Initialization method.
@@ -236,8 +234,7 @@ __attribute__((warn_unused_result));
  @param user The AVUser of this Client.
  @return Instance.
  */
-- (instancetype)initWithUser:(AVUser *)user
-__attribute__((warn_unused_result));
+- (instancetype)initWithUser:(AVUser *)user LC_WARN_UNUSED_RESULT;
 
 /**
  Initialization method.
@@ -246,8 +243,7 @@ __attribute__((warn_unused_result));
   @param tag You can use 'Tag' to implement the feature that the same 'clientId' only used in single device. 'Tag' Can't set with "default", it's a reserved tag.
  @return Instance.
  */
-- (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag
-__attribute__((warn_unused_result));
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag LC_WARN_UNUSED_RESULT;
 
 /**
  Start a Session with Server.
@@ -255,7 +251,7 @@ __attribute__((warn_unused_result));
  
  @param callback Result Callback.
  */
-- (void)openWithCallback:(AVIMBooleanResultBlock)callback;
+- (void)openWithCallback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 
 /**
  Start a Session with Server.
@@ -265,7 +261,7 @@ __attribute__((warn_unused_result));
  @param callback Result Callback.
  */
 - (void)openWithOption:(AVIMClientOpenOption)openOption
-              callback:(AVIMBooleanResultBlock)callback;
+              callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 
 /**
  End a Session with Server.
@@ -273,7 +269,7 @@ __attribute__((warn_unused_result));
  
  @param callback Result Callback.
  */
-- (void)closeWithCallback:(AVIMBooleanResultBlock)callback;
+- (void)closeWithCallback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 
 /*!
  创建一个新的用户对话。
@@ -283,8 +279,8 @@ __attribute__((warn_unused_result));
  @param callback － 对话建立之后的回调
  */
 - (void)createConversationWithName:(NSString * _Nullable)name
-                         clientIds:(NSArray *)clientIds
-                          callback:(AVIMConversationResultBlock)callback;
+                         clientIds:(NSArray<NSString *> *)clientIds
+                          callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
 
 /**
  Create a new chat room conversation.
@@ -295,7 +291,7 @@ __attribute__((warn_unused_result));
  */
 - (void)createChatRoomWithName:(NSString * _Nullable)name
                     attributes:(NSDictionary * _Nullable)attributes
-                      callback:(AVIMChatRoomResultBlock)callback;
+                      callback:(void (^)(AVIMChatRoom * _Nullable chatRoom, NSError * _Nullable error))callback;
 
 /**
  Create a new temporary conversation.
@@ -304,9 +300,9 @@ __attribute__((warn_unused_result));
  @param ttl Use it to setup time to live of temporary conversation. it will not greater than a default max value(depend on server). if set Zero or Negtive, it will use max ttl, Unit of Measure: Second.
  @param callback Result of callback.
  */
-- (void)createTemporaryConversationWithClientIds:(NSArray *)clientIds
+- (void)createTemporaryConversationWithClientIds:(NSArray<NSString *> *)clientIds
                                       timeToLive:(int32_t)ttl
-                                        callback:(AVIMTemporaryConversationResultBlock)callback;
+                                        callback:(void (^)(AVIMTemporaryConversation * _Nullable temporaryConversation, NSError * _Nullable error))callback;
 
 /*!
  创建一个新的用户对话。
@@ -318,10 +314,10 @@ __attribute__((warn_unused_result));
  @param callback － 对话建立之后的回调
  */
 - (void)createConversationWithName:(NSString * _Nullable)name
-                         clientIds:(NSArray *)clientIds
+                         clientIds:(NSArray<NSString *> *)clientIds
                         attributes:(NSDictionary * _Nullable)attributes
                            options:(AVIMConversationOption)options
-                          callback:(AVIMConversationResultBlock)callback;
+                          callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
 
 /**
  Create a New Conversation.
@@ -334,11 +330,11 @@ __attribute__((warn_unused_result));
  @param callback Result callback
  */
 - (void)createConversationWithName:(NSString * _Nullable)name
-                         clientIds:(NSArray *)clientIds
+                         clientIds:(NSArray<NSString *> *)clientIds
                         attributes:(NSDictionary * _Nullable)attributes
                            options:(AVIMConversationOption)options
                       temporaryTTL:(int32_t)temporaryTTL
-                          callback:(AVIMConversationResultBlock)callback;
+                          callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
 
 /**
  Get a Exist Conversation Retained by this Client.
@@ -348,8 +344,7 @@ __attribute__((warn_unused_result));
  @param conversationId conversationId
  @return if the Conversation Exist, return the Instance; if not, return nil.
  */
-- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId
-__attribute__((warn_unused_result));
+- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId LC_WARN_UNUSED_RESULT;
 
 /**
  Remove Conversations Retained by this Client.
@@ -376,15 +371,13 @@ __attribute__((warn_unused_result));
  @param keyedConversation AVIMKeyedConversation 对象。
  @return 已绑定到当前 client 的会话。
  */
-- (AVIMConversation *)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation
-__attribute__((warn_unused_result));
+- (AVIMConversation *)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation LC_WARN_UNUSED_RESULT;
 
 /*!
  构造一个对话查询对象
  @return 对话查询对象.
  */
-- (AVIMConversationQuery *)conversationQuery
-__attribute__((warn_unused_result));
+- (AVIMConversationQuery *)conversationQuery LC_WARN_UNUSED_RESULT;
 
 /*!
  Query online clients within the given array of clients.
@@ -394,7 +387,7 @@ __attribute__((warn_unused_result));
  @param clients  An array of clients you want to query.
  @param callback The callback of query.
  */
-- (void)queryOnlineClientsInClients:(NSArray<NSString *> *)clients callback:(AVIMArrayResultBlock)callback;
+- (void)queryOnlineClientsInClients:(NSArray<NSString *> *)clients callback:(void (^)(NSArray<NSString *> * _Nullable clientIds, NSError * _Nullable error))callback;
 
 @end
 
@@ -498,7 +491,7 @@ __attribute__((warn_unused_result));
  @param clientIds - 加入的新成员列表
  @param clientId - 邀请者的 id
  */
-- (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray *)clientIds byClientId:(NSString *)clientId;
+- (void)conversation:(AVIMConversation *)conversation membersAdded:(NSArray<NSString *> * _Nullable)clientIds byClientId:(NSString * _Nullable)clientId;
 
 /*!
  对话中有成员离开时所有剩余成员都会收到这一通知。
@@ -506,21 +499,21 @@ __attribute__((warn_unused_result));
  @param clientIds - 离开的成员列表
  @param clientId - 操作者的 id
  */
-- (void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray *)clientIds byClientId:(NSString *)clientId;
+- (void)conversation:(AVIMConversation *)conversation membersRemoved:(NSArray<NSString *> * _Nullable)clientIds byClientId:(NSString * _Nullable)clientId;
 
 /*!
  当前用户被邀请加入对话的通知。
  @param conversation － 所属对话
  @param clientId - 邀请者的 id
  */
-- (void)conversation:(AVIMConversation *)conversation invitedByClientId:(NSString *)clientId;
+- (void)conversation:(AVIMConversation *)conversation invitedByClientId:(NSString * _Nullable)clientId;
 
 /*!
  当前用户被踢出对话的通知。
  @param conversation － 所属对话
  @param clientId - 操作者的 id
  */
-- (void)conversation:(AVIMConversation *)conversation kickedByClientId:(NSString *)clientId;
+- (void)conversation:(AVIMConversation *)conversation kickedByClientId:(NSString * _Nullable)clientId;
 
 /*!
  Notification for conversation property update.
@@ -537,10 +530,88 @@ __attribute__((warn_unused_result));
 
  @param conversation Updated conversation.
  @param date Updated date.
- @param clientId The client id which doing this updates.
+ @param clientId Client ID of doing updates.
  @param data Updated data.
  */
-- (void)conversation:(AVIMConversation *)conversation didUpdateAt:(NSDate *)date byClientId:(NSString *)clientId updatedData:(NSDictionary *)data;
+- (void)conversation:(AVIMConversation *)conversation didUpdateAt:(NSDate * _Nullable)date byClientId:(NSString * _Nullable)clientId updatedData:(NSDictionary * _Nullable)data;
+
+/**
+ Notification for conversation's member info updated.
+ 
+ @param conversation Updated conversation.
+ @param byClientId Client ID of doing update.
+ @param memberId Client ID of being updated.
+ @param role Updated role.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMemberInfoUpdateBy:(NSString * _Nullable)byClientId memberId:(NSString * _Nullable)memberId role:(NSString * _Nullable)role;
+
+/**
+ Notification for this client was blocked by other client in the conversation.
+
+ @param conversation Conversation.
+ @param byClientId Who blocking this client.
+ */
+- (void)conversation:(AVIMConversation *)conversation didBlockBy:(NSString * _Nullable)byClientId;
+
+/**
+ Notification for this client was Unblocked by other client in the conversation.
+
+ @param conversation Conversation.
+ @param byClientId Who unblocking this client.
+ */
+- (void)conversation:(AVIMConversation *)conversation didUnblockBy:(NSString * _Nullable)byClientId;
+
+/**
+ Notification for some other clients was blocked by a client in the conversation.
+
+ @param conversation Conversation.
+ @param byClientId Who blocking these clients.
+ @param memberIds Being blocked clients's ID array.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMembersBlockBy:(NSString * _Nullable)byClientId memberIds:(NSArray<NSString *> * _Nullable)memberIds;
+
+/**
+ Notification for some other clients was unblocked by a client in the conversation.
+
+ @param conversation Conversation.
+ @param byClientId Who unblocking these clients.
+ @param memberIds Being unblocked clients's ID array.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMembersUnblockBy:(NSString * _Nullable)byClientId memberIds:(NSArray<NSString *> * _Nullable)memberIds;
+
+/**
+ Notification for this client was muted by other client in the conversation.
+ 
+ @param conversation Conversation.
+ @param byClientId Who muting this client.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMuteBy:(NSString * _Nullable)byClientId;
+
+/**
+ Notification for this client was Unmuted by other client in the conversation.
+ 
+ @param conversation Conversation.
+ @param byClientId Who unmuting this client.
+ */
+- (void)conversation:(AVIMConversation *)conversation didUnmuteBy:(NSString * _Nullable)byClientId;
+
+/**
+ Notification for some other clients was muted by a client in the conversation.
+ 
+ @param conversation Conversation.
+ @param byClientId Who muted these clients.
+ @param memberIds Being muted clients's ID array.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMembersMuteBy:(NSString * _Nullable)byClientId memberIds:(NSArray<NSString *> * _Nullable)memberIds;
+
+/**
+ Notification for some other clients was unmuted by a client in the conversation.
+ 
+ @param conversation Conversation.
+ @param byClientId Who unmuting these clients.
+ @param memberIds Being unmuting clients's ID array.
+ */
+- (void)conversation:(AVIMConversation *)conversation didMembersUnmuteBy:(NSString * _Nullable)byClientId memberIds:(NSArray<NSString *> * _Nullable)memberIds;
 
 /**
  *  当前聊天状态被暂停，常见于网络断开时触发。
