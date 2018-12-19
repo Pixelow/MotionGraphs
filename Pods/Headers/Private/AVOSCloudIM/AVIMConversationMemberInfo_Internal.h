@@ -1,0 +1,1 @@
+../../../AVOSCloudIM/AVOS/AVOSCloudIM/Conversation/AVIMConversationMemberInfo_Internal.h

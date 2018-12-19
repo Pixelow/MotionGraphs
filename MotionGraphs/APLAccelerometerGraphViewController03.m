@@ -22,13 +22,24 @@
 #import "AppSandboxDetailViewController.h"
 #import <mach/mach.h>
 #import <CloudKit/CloudKit.h>
+#import "AVObject.h"
+#import <AVOSCloudLiveQuery/AVOSCloudLiveQuery.h>
+#import "AVQuery.h"
+#import "sys/utsname.h"
 
 #define UBIQUITY_CONTAINER_URL @"iCloud.com.saitama.MotionGraphs"
+
+#define GROUPCONTROL_CLASSNAME @"SeismologicalBureau_GroupControl"
+#define FORCEREMOTESTART_CLASSNAME @"SeismologicalBureau_ForceRemoteStart"
+#define FORCEREMOTESTOP_CLASSNAME @"SeismologicalBureau_ForceRemoteStop"
+#define REMOTESTART_CLASSNAME @"SeismologicalBureau_RemoteStart"
+#define REMOTESTOP_CLASSNAME @"SeismologicalBureau_RemoteStop"
+#define TRIGGERED_CLASSNAME @"SeismologicalBureau_Triggered"
 
 #define RGB_Alpha(r, g, b, alp) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: alp]
 #define RGB(r, g, b) [UIColor colorWithRed:(r)/255. green:(g)/255. blue:(b)/255. alpha: 1]
 
-@interface APLAccelerometerGraphViewController03 ()
+@interface APLAccelerometerGraphViewController03 () <UITableViewDelegate, UITableViewDataSource,AVLiveQueryDelegate>
 
 @property (strong,nonatomic) BufferRecords *bufferRecord;
 @property (strong,nonatomic) SeismicRecords *seismicRecord;
@@ -38,6 +49,8 @@
 
 @property (weak, nonatomic) IBOutlet UIView *whiteView;
 @property (weak, nonatomic) IBOutlet UIView *blueView;
+@property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) UITableView *blueIIView;
 @property (weak, nonatomic) IBOutlet UIView *grayView;
 @property (weak, nonatomic) IBOutlet UIView *blackView;
 @property (weak, nonatomic) IBOutlet UIView *phoneView;
@@ -71,12 +84,17 @@
 @property (strong,nonatomic) NSDateFormatter *dateFormatter;
 @property (strong,nonatomic) NSArray *arr;
 @property (nonatomic) float userSamplingRate, triggerThreshold, bufferLength, recordLength, day, month, year, angleX, angleY, angleZ, lastNormalizedValue;
+
 @property (strong, nonatomic) NSMetadataQuery *query;
-@property (strong, nonatomic) NSMetadataQuery *remoteStartQuery;
-@property (strong, nonatomic) NSMetadataQuery *remoteStopQuery;
-@property (strong, nonatomic) NSMetadataQuery *forceRemoteStartQuery;
-@property (strong, nonatomic) NSMetadataQuery *forceRemoteStopQuery;
-@property (strong, nonatomic) NSMetadataQuery *triggeredInfoQuery;
+@property (strong, nonatomic) AVLiveQuery *remoteStartQuery;
+@property (strong, nonatomic) AVLiveQuery *remoteStopQuery;
+@property (strong, nonatomic) AVLiveQuery *forceRemoteStartQuery;
+@property (strong, nonatomic) AVLiveQuery *forceRemoteStopQuery;
+@property (strong, nonatomic) AVLiveQuery *triggeredInfoQuery;
+
+@property (strong, nonatomic) AVLiveQuery *doingLiveQuery;
+@property (strong, nonatomic) NSMutableArray *blueIIArray;
+@property (strong, nonatomic) NSString *objectId;
 
 @property (nonatomic) APLDocument *document;
 @property (nonatomic) NSFileManager *manager;
@@ -84,7 +102,6 @@
 @property (nonatomic) NSURL *destinationUrl;
 
 @end
-
 
 @implementation APLAccelerometerGraphViewController03
 
@@ -111,10 +128,30 @@
     self.intervalUnit.frame = CGRectMake(72, 0, 6, self.view.frame.size.height*0.056);
     self.updateIntervalSlider.frame = CGRectMake(102, 0, self.view.frame.size.width-102-16, self.view.frame.size.height*0.056);
     
-    self.blueView.frame = CGRectMake(0, self.view.frame.size.height*0.336, self.view.frame.size.width, self.view.frame.size.height*0.2);
+    //滚动视图
+    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height*0.336, self.view.frame.size.width, self.view.frame.size.height*0.2)];
+    self.scrollView.backgroundColor = [UIColor whiteColor];
+    self.scrollView.pagingEnabled = YES;
+    self.scrollView.showsVerticalScrollIndicator = FALSE;
+    self.scrollView.showsHorizontalScrollIndicator = FALSE;
+    [self.view addSubview:self.scrollView];
+    
+    self.blueView.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height*0.2);
     self.remoteSync.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height*0.07);
     self.remoteNote.frame = CGRectMake(0, self.view.frame.size.height*0.054, self.view.frame.size.width, self.view.frame.size.height*0.06);
     self.mySwitch.frame = CGRectMake((self.view.frame.size.width-self.mySwitch.frame.size.width)/2.0, self.view.frame.size.height*0.124, self.view.frame.size.width, self.view.frame.size.height*0.06);
+    
+    self.blueIIView = [[UITableView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width, 0, self.view.frame.size.width, self.view.frame.size.height*0.2)];
+    self.blueIIView.delegate = self;
+    self.blueIIView.dataSource = self;
+    self.blueIIView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+    
+    [self.scrollView addSubview:self.blueView];
+    [self.scrollView addSubview:self.blueIIView];
+    
+    CGRect contentRect = CGRectMake(0, self.view.frame.size.height*0.336, self.view.frame.size.width*2.0, self.view.frame.size.height*0.2);
+    self.scrollView.contentSize = contentRect.size;
+    //
     
     self.blackView.frame = CGRectMake(0, self.view.frame.size.height*0.536, self.view.frame.size.width, self.view.frame.size.height*0.04);
     self.blackView.layer.borderWidth = 0.2;
@@ -227,9 +264,224 @@
     self.angleX=0; self.angleY=0; self.angleZ=0;
     
     [self initializeRecordParameters];
-    [self loadQueryUpdate];
+    
+//    [self loadQueryUpdate];
+    [self initLiveQueryList];
+    [self updateTableView];
 }
 
+- (void)initLiveQueryList {
+    //liveQuery
+    NSString *deviceName = [UIDevice currentDevice].name;
+    NSString *deviceType = [self getDeviceName];
+    NSString *device = [NSString stringWithFormat:@"%@'s %@", deviceName, deviceType];
+    
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
+    [doingQuery whereKey:@"device" equalTo:device];
+    [doingQuery findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        /* Doing list did fetch. */
+        if (![objects count]) {
+            AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME];
+            groupControl[@"state"] = @"Local";
+            groupControl[@"device"] = device;
+            [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                /* Saved. */
+                self.objectId = groupControl[@"objectId"];
+                [self liveQueryObserver];
+                [self updateTableView];
+            }];
+        } else {
+            [self liveQueryObserver];
+            for (AVObject *obj in objects) {
+                self.objectId = obj[@"objectId"];
+            }
+            AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
+            groupControl[@"state"] = @"Local";
+            [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+                /* Saved. */
+                [self updateTableView];
+            }];
+        }
+    }];
+}
+
+- (void)updateTableView {
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
+    [doingQuery findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+        /* Doing list did fetch. */
+        if ([objects count]) {
+            self.blueIIArray = [[NSMutableArray alloc] initWithArray:objects];
+            [self.blueIIView reloadData];
+        }
+    }];
+}
+
+- (void)liveQueryObserver {
+    AVQuery *doingQuery = [AVQuery queryWithClassName:GROUPCONTROL_CLASSNAME];
+    self.doingLiveQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.doingLiveQuery.delegate = self;
+    [self.doingLiveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+}
+
+#pragma mark - LiveQuery delegate methods
+- (void)liveQuery:(AVLiveQuery *)liveQuery objectDidCreate:(id)object {
+    if (liveQuery == self.doingLiveQuery) {
+        /* A new doing task did create. */
+        [self updateTableView];
+    } else if (liveQuery == self.remoteStartQuery) {
+        __unsafe_unretained typeof(self) weakSelf = self;
+        weakSelf.forceStartStopTrigger = YES;
+        
+        if (!weakSelf.remoteStartStop && weakSelf.forceStartStopTrigger) {
+            self.halo.radius = 60;
+            weakSelf.forceStartStopTrigger=NO;
+            weakSelf.remoteStartStop = YES;
+            weakSelf.remoteBuffer = YES;
+            [weakSelf.remoteStartStopButton setTitle:NSLocalizedString(@"Stop Buffer","") forState:UIControlStateNormal];
+            weakSelf.recordInfo.text = NSLocalizedString(@"Buffering","");
+            weakSelf.startBufferDate = [NSDate date];
+        }
+    } else if (liveQuery == self.remoteStopQuery) {
+        __unsafe_unretained typeof(self) weakSelf = self;
+        weakSelf.forceStartStopTrigger = YES;
+        
+        if (weakSelf.remoteStartStop && weakSelf.forceStartStopTrigger) {
+            self.halo.radius = 0;
+            weakSelf.forceStartStopTrigger=NO;
+            weakSelf.remoteStartStop=NO;
+            weakSelf.recordInfo.text = @"";
+            weakSelf.remoteBuffer = NO;
+            weakSelf.WeAreRecording = NO;
+            weakSelf.InitialBuffer = NO;
+            [weakSelf.remoteStartStopButton setTitle:NSLocalizedString(@"Remote Buffer","") forState:UIControlStateNormal];
+            weakSelf.bufferRecord = nil; weakSelf.seismicRecord = nil;
+            self.statusOfRecord.text = NSLocalizedString(@"Status Of Record",@"");
+            
+            if (self.isForceTriggered) {
+                self.WeAreRecording = NO;
+                self.isForceTriggered = NO;
+                NSString *stoppedRecord = NSLocalizedString(@"Stopped Recording at:",@"");
+                self.statusOfRecord.text = [NSString stringWithFormat:@"%@ \n %@", stoppedRecord, [self.dateFormatter stringFromDate:self.endRecordDate].description];
+            }
+            
+            if (weakSelf.WeAreRecording) {
+                [weakSelf stopRecording];
+                [weakSelf fileUploadToDeviceAndServer];
+            }
+        }
+        
+        self.forceRemoteStartStopButton.userInteractionEnabled = YES;
+        self.forceRemoteStartStopButton.backgroundColor = RGB_Alpha(31, 183, 252, 1);
+        [self.forceRemoteStartStopButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    } else if (liveQuery == self.forceRemoteStartQuery) {
+        self.remoteStartStopButton.userInteractionEnabled = NO;
+        self.remoteStartStopButton.backgroundColor = [UIColor darkGrayColor];
+        [self.remoteStartStopButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        
+        __unsafe_unretained typeof(self) weakSelf = self;
+        weakSelf.forceStartStopTrigger = YES;
+        
+        if (weakSelf.forceStartStopTrigger) {
+            weakSelf.forceStartStopTrigger = NO;
+            weakSelf.remoteStartStop = YES;
+            [weakSelf startRecording];
+            [weakSelf.forceRemoteStartStopButton setTitle:NSLocalizedString(@"Stop Record","") forState:
+             UIControlStateNormal];
+            weakSelf.recordInfo.text = NSLocalizedString(@"Recording","");
+            self.halo.radius = 60;
+        }
+    } else if (liveQuery == self.forceRemoteStopQuery) {
+        self.remoteStartStopButton.userInteractionEnabled = YES;
+        self.remoteStartStopButton.backgroundColor = RGB_Alpha(31, 183, 252, 1);
+        [self.remoteStartStopButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        
+        __unsafe_unretained typeof(self) weakSelf = self;
+        weakSelf.forceStartStopTrigger = YES;
+        
+        if (weakSelf.remoteStartStop && weakSelf.forceStartStopTrigger) {
+            weakSelf.forceStartStopTrigger=NO;
+            weakSelf.remoteStartStop=NO;
+            
+            if (weakSelf.WeAreRecording) {
+                [weakSelf stopRecording];
+                [weakSelf fileUploadToDeviceAndServer];
+            }
+            
+            weakSelf.remoteBuffer = NO;
+            weakSelf.WeAreRecording = NO;
+            weakSelf.InitialBuffer = NO;
+            [weakSelf.forceRemoteStartStopButton setTitle:NSLocalizedString(@"Remote Record","") forState:UIControlStateNormal];
+            weakSelf.recordInfo.text = @"";
+            weakSelf.bufferRecord = nil; weakSelf.seismicRecord = nil;
+            self.statusOfRecord.text = NSLocalizedString(@"Status Of Record",@"");
+            self.halo.radius = 0;
+            [weakSelf.remoteStartStopButton setTitle:NSLocalizedString(@"Remote Buffer","") forState:UIControlStateNormal];
+            
+            if (self.isForceTriggered) {
+                self.WeAreRecording = NO;
+                self.isForceTriggered = NO;
+                
+                NSString *stoppedRecord = NSLocalizedString(@"Stopped Recording at:",@"");
+                self.statusOfRecord.text = [NSString stringWithFormat:@"%@ \n %@", stoppedRecord, [self.dateFormatter stringFromDate:self.endRecordDate].description];
+            }
+        }
+    } else if (liveQuery == self.triggeredInfoQuery) {
+        self.WeAreRecording = YES;
+        self.isForceTriggered = YES;
+        self.startRecordDate = [NSDate date];
+        [self.seismicRecord checkEventOfRecordingForAllActiveDevices:[NSDate date]];
+        [self.bufferButton setTitle:NSLocalizedString(@"Stop Record","") forState:UIControlStateNormal];
+        self.recordInfo.text = NSLocalizedString(@"Recording","");
+        self.halo.radius = 60;
+        self.forceRemoteStartStopButton.userInteractionEnabled = NO;
+        self.forceRemoteStartStopButton.backgroundColor = [UIColor darkGrayColor];
+        [self.forceRemoteStartStopButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+    }
+}
+
+- (void)liveQuery:(AVLiveQuery *)liveQuery objectDidUpdate:(id)object updatedKeys:(NSArray<NSString *> *)updatedKeys {
+    for (NSString *key in updatedKeys) {
+        NSLog(@"%@: %@", key, object[key]);
+        [self updateTableView];
+    }
+}
+
+#pragma mark - TableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.blueIIArray.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellIdentifier = @"Cell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellIdentifier];
+    }
+    
+    // Configure the cell (with reversing the order of elements - the most recent file at top of table view )
+    
+    AVObject *obj = self.blueIIArray[indexPath.row];
+    NSString *state = obj[@"state"];
+    NSString *device = obj[@"device"];
+    cell.textLabel.text = device;
+    cell.textLabel.font = [UIFont systemFontOfSize:14];
+    cell.detailTextLabel.text = state;
+    cell.detailTextLabel.textColor = [state isEqual:@"Local"]?[UIColor lightGrayColor]:RGB(31, 183, 252);
+    cell.detailTextLabel.font= [UIFont systemFontOfSize:12];
+
+    return cell;
+}
+
+//
 - (void)initializeRecordParameters
 {
     // ------ Read the contents of file from iCloud Drive on background thread so that main thread is not blocked -----------
@@ -279,7 +531,6 @@
     sector1.endValue = 1.0;
     
     [self.multisectorControl addSector:sector1];
-    
     [self updateDataView];
 }
 
@@ -310,34 +561,40 @@
 -(IBAction)changeSwitch:(id)sender{
     
     if (self.mySwitch.on) {
-        
         self.isRemoteFunctionOn = YES;
-        
         self.bufferButton.hidden = YES;
         self.recordButton.hidden = YES;
-        
         self.remoteStartStopButton.enabled = YES;
         self.forceRemoteStartStopButton.enabled = YES;
-        
         self.serverCheckDate = [NSDate date];
-        
         self.controlMode.text = NSLocalizedString(@"Group Control","");
         
-        [self startQueryUpdate];
+//        [self startQueryUpdate];
+        [self loadQueryUpdate];
+        
+        //liveQuery
+        AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
+        groupControl[@"state"] = @"Remote";
+        [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            /* Saved. */
+        }];
         
     } else {
-        
         self.isRemoteFunctionOn = NO;
-        
         self.bufferButton.hidden = NO;
         self.recordButton.hidden = NO;
-        
         self.remoteStartStopButton.enabled=NO;
         self.forceRemoteStartStopButton.enabled=NO;
-        
         self.controlMode.text = NSLocalizedString(@"Local Control","");
         
         [self stopQueryUpdate];
+        
+        //liveQuery
+        AVObject *groupControl = [AVObject objectWithClassName:GROUPCONTROL_CLASSNAME objectId:self.objectId];
+        groupControl[@"state"] = @"Local";
+        [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+            /* Saved. */
+        }];
     }
 }
 
@@ -414,11 +671,8 @@
 - (IBAction)forceStartStopRemotely:(UIButton *)sender {
     
     if (self.WeAreRecording){
-        
         [self setForceRemoteStopNotification];
-        
     } else {
-        
         [self setForceRemoteStartNotification];
     }
 }
@@ -429,75 +683,110 @@
 
 - (void)setForceRemoteStartNotification
 {
-    NSString *folderName1 = @"Supporting Files";
-    NSString *folderName2 = @"Force Remote Start Info";
+//    iCloud Drive
+//    NSString *folderName1 = @"Supporting Files";
+//    NSString *folderName2 = @"Force Remote Start Info";
+//
+//    NSDate *date = [NSDate date];
+//    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice] name],[self.dateFormatter stringFromDate:date].description,folderName2];
+//    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Start info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
+//
+//    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
+//
+//    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
-    NSDate *date = [NSDate date];
-    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice] name],[self.dateFormatter stringFromDate:date].description,folderName2];
-    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Start info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
-    
-    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
-    
-    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
+    // LiveQuery
+    AVObject *groupControl = [AVObject objectWithClassName:FORCEREMOTESTART_CLASSNAME];
+    [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        /* Saved. */
+    }];
 }
 
 - (void)setForceRemoteStopNotification
 {
-    NSString *folderName1 = @"Supporting Files";
-    NSString *folderName2 = @"Force Remote Stop Info";
+//    iCloud Drive
+//    NSString *folderName1 = @"Supporting Files";
+//    NSString *folderName2 = @"Force Remote Stop Info";
+//
+//    NSDate *date = [NSDate date];
+//    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
+//    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Stopped info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
+//
+//    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
+//
+//    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
-    NSDate *date = [NSDate date];
-    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
-    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Stopped info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
-    
-    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
-    
-    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
+    // LiveQuery
+    AVObject *groupControl = [AVObject objectWithClassName:FORCEREMOTESTOP_CLASSNAME];
+    [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        /* Saved. */
+    }];
 }
-
 
 - (void)setRemoteStartNotification
 {
-    NSString *folderName1 = @"Supporting Files";
-    NSString *folderName2 = @"Remote Start Info";
+//    iCloud Drive
+//    NSString *folderName1 = @"Supporting Files";
+//    NSString *folderName2 = @"Remote Start Info";
+//
+//    NSDate *date = [NSDate date];
+//    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
+//    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Start info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
+//
+//    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
+//
+//    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
-    NSDate *date = [NSDate date];
-    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
-    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Start info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
-
-    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
-    
-    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
+    // LiveQuery
+    AVObject *groupControl = [AVObject objectWithClassName:REMOTESTART_CLASSNAME];
+    [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        /* Saved. */
+    }];
 }
 
 - (void)setRemoteStopNotification
 {
-    NSString *folderName1 = @"Supporting Files";
-    NSString *folderName2 = @"Remote Stop Info";
+//    iCloud Drive
+//    NSString *folderName1 = @"Supporting Files";
+//    NSString *folderName2 = @"Remote Stop Info";
+//
+//    NSDate *date = [NSDate date];
+//    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
+//    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Stopped info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
+//
+//    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
+//
+//    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
-    NSDate *date = [NSDate date];
-    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
-    NSString *messageString = [NSString stringWithFormat:@"Device Remotely Stopped info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
-    
-    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
-    
-    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
+    // LiveQuery
+    AVObject *groupControl = [AVObject objectWithClassName:REMOTESTOP_CLASSNAME];
+    [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        /* Saved. */
+    }];
 }
 
 - (void)setTriggeredInfoNotification
 {
-    NSString *folderName1 = @"Supporting Files";
-    NSString *folderName2 = @"Triggered Info";
+//    iCloud Drive
+//    NSString *folderName1 = @"Supporting Files";
+//    NSString *folderName2 = @"Triggered Info";
+//
+//    NSDate *date = [NSDate date];
+//    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
+//    NSString *messageString = [NSString stringWithFormat:@"Device Triggered info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
+//
+//    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
+//
+//    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
     
-    NSDate *date = [NSDate date];
-    NSString *notificationFilename = [NSString stringWithFormat:@"%@ at %@[%@].txt",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description,folderName2];
-    NSString *messageString = [NSString stringWithFormat:@"Device Triggered info: %@ \n %@",[[UIDevice currentDevice]name],[self.dateFormatter stringFromDate:date].description];
-    
-    NSString *destDir = [NSString stringWithFormat:@"/%@/%@",folderName1,folderName2];
-    
-    [self saveToiCloud:destDir fileName:notificationFilename filePath:nil fileContent:messageString];
+    // LiveQuery
+    AVObject *groupControl = [AVObject objectWithClassName:TRIGGERED_CLASSNAME];
+    [groupControl saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        /* Saved. */
+    }];
 }
 
+//
 - (void)startUpdatesWithSliderValue:(int)sliderValue
 {
     float accelerometerMin;
@@ -626,7 +915,7 @@
 #pragma mark - Check for Record Time to stop/Continue Record
                 
                 [self calculateTimeOfRecord];
-                if (self.seismicRecord.recordingStopped || self.timeOfRecord>10) {
+                if (self.seismicRecord.recordingStopped || self.timeOfRecord>300) {
                     
                     [self stopRecording];
                     [self fileUploadToDeviceAndServer];
@@ -685,7 +974,6 @@
         NSString *statusFilename = [NSString stringWithFormat:@"%@.txt",[self.dateFormatter stringFromDate:date].description];
         NSString *deviceName = [[UIDevice currentDevice]name];
         NSString *folder = [NSString stringWithFormat:@"/%@/%@",@"Status Info",deviceName];
-        
         
         // Check Battery level
         UIDevice *myDevice = [UIDevice currentDevice];
@@ -897,7 +1185,6 @@
 
 -(void)checkIfRemoteStarted
 {
-    
     // iCLoud未替换
     
 //    NSString *destDirStart = [NSString stringWithFormat:@"/%@/%@",@"Supporting Files",@"Remote Start Info"];
@@ -1059,7 +1346,6 @@
         [self.waveformView updateWithLevel:normalizedValue];
     }
 
-    
     // 计算差值失败，以后再研究
 //    self.lastNormalizedValue = normalizedValue;
 }
@@ -1092,7 +1378,6 @@
     
     //取得最终地址
     _destinationUrl = [_destinationUrl URLByAppendingPathComponent:fileName];
-    
     return _destinationUrl;
 }
 
@@ -1152,66 +1437,95 @@
 }
 
 //从iCloud上加载所有文档信息
+//LiveQuery
 - (void)loadQueryUpdate
 {
     // Remote Start Info
-    self.remoteStartQuery = [[NSMetadataQuery alloc] init];
-    [self.remoteStartQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-    
-    NSString *remoteStartFilePattern = [NSString stringWithFormat:@"*[Remote Start Info].txt"];
-    [self.remoteStartQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                                         NSMetadataItemFSNameKey, remoteStartFilePattern]];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStartQuery];
-    
+//    self.remoteStartQuery = [[NSMetadataQuery alloc] init];
+//    [self.remoteStartQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+//
+//    NSString *remoteStartFilePattern = [NSString stringWithFormat:@"*[Remote Start Info].txt"];
+//    [self.remoteStartQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+//                                         NSMetadataItemFSNameKey, remoteStartFilePattern]];
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStartQuery];
+    AVQuery *doingQuery = [AVQuery queryWithClassName:REMOTESTART_CLASSNAME];
+    self.remoteStartQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.remoteStartQuery.delegate = self;
+    [self.remoteStartQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
     
     // Remote Stop Info
-    self.remoteStopQuery = [[NSMetadataQuery alloc] init];
-    [self.remoteStopQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-    
-    NSString *remoteStopFilePattern = [NSString stringWithFormat:@"*[Remote Stop Info].txt"];
-    [self.remoteStopQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                                         NSMetadataItemFSNameKey, remoteStopFilePattern]];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStopQuery];
-    
+//    self.remoteStopQuery = [[NSMetadataQuery alloc] init];
+//    [self.remoteStopQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+//
+//    NSString *remoteStopFilePattern = [NSString stringWithFormat:@"*[Remote Stop Info].txt"];
+//    [self.remoteStopQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+//                                         NSMetadataItemFSNameKey, remoteStopFilePattern]];
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(remoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.remoteStopQuery];
+    doingQuery = [AVQuery queryWithClassName:REMOTESTOP_CLASSNAME];
+    self.remoteStopQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.remoteStopQuery.delegate = self;
+    [self.remoteStopQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
     
     // Force Remote Start Info
-    self.forceRemoteStartQuery = [[NSMetadataQuery alloc] init];
-    [self.forceRemoteStartQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-    
-    NSString *forceRemoteStartFilePattern = [NSString stringWithFormat:@"*[Force Remote Start Info].txt"];
-    [self.forceRemoteStartQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                                        NSMetadataItemFSNameKey, forceRemoteStartFilePattern]];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStartQuery];
+//    self.forceRemoteStartQuery = [[NSMetadataQuery alloc] init];
+//    [self.forceRemoteStartQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+//
+//    NSString *forceRemoteStartFilePattern = [NSString stringWithFormat:@"*[Force Remote Start Info].txt"];
+//    [self.forceRemoteStartQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+//                                        NSMetadataItemFSNameKey, forceRemoteStartFilePattern]];
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStartInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStartQuery];
+    doingQuery = [AVQuery queryWithClassName:FORCEREMOTESTART_CLASSNAME];
+    self.forceRemoteStartQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.forceRemoteStartQuery.delegate = self;
+    [self.forceRemoteStartQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
     
     
     // Force Remote Stop Info
-    self.forceRemoteStopQuery = [[NSMetadataQuery alloc] init];
-    [self.forceRemoteStopQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-    
-    NSString *forceRemoteStopFilePattern = [NSString stringWithFormat:@"*[Force Remote Stop Info].txt"];
-    [self.forceRemoteStopQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                                              NSMetadataItemFSNameKey, forceRemoteStopFilePattern]];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStopQuery];
+//    self.forceRemoteStopQuery = [[NSMetadataQuery alloc] init];
+//    [self.forceRemoteStopQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+//
+//    NSString *forceRemoteStopFilePattern = [NSString stringWithFormat:@"*[Force Remote Stop Info].txt"];
+//    [self.forceRemoteStopQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+//                                              NSMetadataItemFSNameKey, forceRemoteStopFilePattern]];
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(forceRemoteStopInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.forceRemoteStopQuery];
+    doingQuery = [AVQuery queryWithClassName:FORCEREMOTESTOP_CLASSNAME];
+    self.forceRemoteStopQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.forceRemoteStopQuery.delegate = self;
+    [self.forceRemoteStopQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
     
     // Triggered Info
-    self.triggeredInfoQuery = [[NSMetadataQuery alloc] init];
-    [self.triggeredInfoQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-    
-    NSString *triggeredInfoFilePattern = [NSString stringWithFormat:@"*[Triggered Info].txt"];
-    [self.triggeredInfoQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
-                                             NSMetadataItemFSNameKey, triggeredInfoFilePattern]];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(triggeredInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.triggeredInfoQuery];
+//    self.triggeredInfoQuery = [[NSMetadataQuery alloc] init];
+//    [self.triggeredInfoQuery setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+//
+//    NSString *triggeredInfoFilePattern = [NSString stringWithFormat:@"*[Triggered Info].txt"];
+//    [self.triggeredInfoQuery setPredicate:[NSPredicate predicateWithFormat:@"%K LIKE %@",
+//                                             NSMetadataItemFSNameKey, triggeredInfoFilePattern]];
+//
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(triggeredInfoDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:self.triggeredInfoQuery];
+    doingQuery = [AVQuery queryWithClassName:TRIGGERED_CLASSNAME];
+    self.triggeredInfoQuery = [[AVLiveQuery alloc] initWithQuery:doingQuery];
+    self.triggeredInfoQuery.delegate = self;
+    [self.triggeredInfoQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
 }
 
 // 查询更新
 - (void)remoteStartInfoDidUpdate:(NSNotification *)notification
 {
-    [self.remoteStartQuery stopQuery];
+//    [self.remoteStartQuery stopQuery];
     
     __unsafe_unretained typeof(self) weakSelf = self;
     
@@ -1237,7 +1551,7 @@
 
 - (void)remoteStopInfoDidUpdate:(NSNotification *)notification
 {
-    [self.remoteStartQuery startQuery];
+//    [self.remoteStartQuery startQuery];
     
     __unsafe_unretained typeof(self) weakSelf = self;
     
@@ -1284,7 +1598,7 @@
 
 - (void)forceRemoteStartInfoDidUpdate:(NSNotification *)notification
 {
-    [self.forceRemoteStartQuery stopQuery];
+//    [self.forceRemoteStartQuery stopQuery];
     
     self.remoteStartStopButton.userInteractionEnabled = NO;
     self.remoteStartStopButton.backgroundColor = [UIColor darkGrayColor];
@@ -1312,8 +1626,8 @@
 
 - (void)forceRemoteStopInfoDidUpdate:(NSNotification *)notification
 {
-    [self.forceRemoteStartQuery startQuery];
-    [self.remoteStartQuery startQuery];
+//    [self.forceRemoteStartQuery startQuery];
+//    [self.remoteStartQuery startQuery];
     
     self.remoteStartStopButton.userInteractionEnabled = YES;
     self.remoteStartStopButton.backgroundColor = RGB_Alpha(31, 183, 252, 1);
@@ -1362,9 +1676,7 @@
 - (void)triggeredInfoDidUpdate:(NSNotification *)notification
 {
 //    [self.triggeredInfoQuery stopQuery];
-    
 //    __unsafe_unretained typeof(self) weakSelf = self;
-    
 //    if (!weakSelf.recordButton.enabled) {
         self.WeAreRecording = YES;
         self.isForceTriggered = YES;
@@ -1383,24 +1695,135 @@
 //    NSLog(@"我是triggeredInfoDidUpdate");
 }
 
-
+//
 - (void)startQueryUpdate
 {
-    [self.remoteStartQuery startQuery];
-    [self.remoteStopQuery startQuery];
-    [self.forceRemoteStartQuery startQuery];
-    [self.forceRemoteStopQuery startQuery];
-    [self.triggeredInfoQuery startQuery];
+//    [self.remoteStartQuery startQuery];
+//    [self.remoteStopQuery startQuery];
+//    [self.forceRemoteStartQuery startQuery];
+//    [self.forceRemoteStopQuery startQuery];
+//    [self.triggeredInfoQuery startQuery];
 }
 
 
 - (void)stopQueryUpdate
 {
-    [self.remoteStartQuery stopQuery];
-    [self.remoteStopQuery stopQuery];
-    [self.forceRemoteStartQuery stopQuery];
-    [self.forceRemoteStopQuery stopQuery];
-    [self.triggeredInfoQuery stopQuery];
+//    [self.remoteStartQuery stopQuery];
+//    [self.remoteStopQuery stopQuery];
+//    [self.forceRemoteStartQuery stopQuery];
+//    [self.forceRemoteStopQuery stopQuery];
+//    [self.triggeredInfoQuery stopQuery];
+    
+    [self.remoteStartQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+    
+    [self.remoteStopQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+    
+    [self.forceRemoteStartQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+    
+    [self.forceRemoteStopQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+    
+    [self.triggeredInfoQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+        /* Subscribed. */
+    }];
+}
+
+    // ---------------------------------------------------------------------------------------
+
+// 获取设备型号然后手动转化为对应名称
+- (NSString *)getDeviceName
+{
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+    
+    if ([deviceString isEqualToString:@"iPhone3,1"])    return @"iPhone 4";
+    if ([deviceString isEqualToString:@"iPhone3,2"])    return @"iPhone 4";
+    if ([deviceString isEqualToString:@"iPhone3,3"])    return @"iPhone 4";
+    if ([deviceString isEqualToString:@"iPhone4,1"])    return @"iPhone 4S";
+    if ([deviceString isEqualToString:@"iPhone5,1"])    return @"iPhone 5";
+    if ([deviceString isEqualToString:@"iPhone5,2"])    return @"iPhone 5 (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPhone5,3"])    return @"iPhone 5c (GSM)";
+    if ([deviceString isEqualToString:@"iPhone5,4"])    return @"iPhone 5c (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPhone6,1"])    return @"iPhone 5s (GSM)";
+    if ([deviceString isEqualToString:@"iPhone6,2"])    return @"iPhone 5s (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPhone7,1"])    return @"iPhone 6 Plus";
+    if ([deviceString isEqualToString:@"iPhone7,2"])    return @"iPhone 6";
+    if ([deviceString isEqualToString:@"iPhone8,1"])    return @"iPhone 6s";
+    if ([deviceString isEqualToString:@"iPhone8,2"])    return @"iPhone 6s Plus";
+    if ([deviceString isEqualToString:@"iPhone8,4"])    return @"iPhone SE";
+
+    if ([deviceString isEqualToString:@"iPhone9,1"])    return @"国行、日版、港行iPhone 7";
+    if ([deviceString isEqualToString:@"iPhone9,2"])    return @"港行、国行iPhone 7 Plus";
+    if ([deviceString isEqualToString:@"iPhone9,3"])    return @"美版、台版iPhone 7";
+    if ([deviceString isEqualToString:@"iPhone9,4"])    return @"美版、台版iPhone 7 Plus";
+    if ([deviceString isEqualToString:@"iPhone10,1"])   return @"国行(A1863)、日行(A1906)iPhone 8";
+    if ([deviceString isEqualToString:@"iPhone10,4"])   return @"美版(Global/A1905)iPhone 8";
+    if ([deviceString isEqualToString:@"iPhone10,2"])   return @"国行(A1864)、日行(A1898)iPhone 8 Plus";
+    if ([deviceString isEqualToString:@"iPhone10,5"])   return @"美版(Global/A1897)iPhone 8 Plus";
+    if ([deviceString isEqualToString:@"iPhone10,3"])   return @"国行(A1865)、日行(A1902)iPhone X";
+    if ([deviceString isEqualToString:@"iPhone10,6"])   return @"美版(Global/A1901)iPhone X";
+    
+    if ([deviceString isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
+    if ([deviceString isEqualToString:@"iPod2,1"])      return @"iPod Touch 2G";
+    if ([deviceString isEqualToString:@"iPod3,1"])      return @"iPod Touch 3G";
+    if ([deviceString isEqualToString:@"iPod4,1"])      return @"iPod Touch 4G";
+    if ([deviceString isEqualToString:@"iPod5,1"])      return @"iPod Touch (5 Gen)";
+    
+    if ([deviceString isEqualToString:@"iPad1,1"])      return @"iPad";
+    if ([deviceString isEqualToString:@"iPad1,2"])      return @"iPad 3G";
+    if ([deviceString isEqualToString:@"iPad2,1"])      return @"iPad 2 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad2,2"])      return @"iPad 2";
+    if ([deviceString isEqualToString:@"iPad2,3"])      return @"iPad 2 (CDMA)";
+    if ([deviceString isEqualToString:@"iPad2,4"])      return @"iPad 2";
+    if ([deviceString isEqualToString:@"iPad2,5"])      return @"iPad Mini (WiFi)";
+    if ([deviceString isEqualToString:@"iPad2,6"])      return @"iPad Mini";
+    if ([deviceString isEqualToString:@"iPad2,7"])      return @"iPad Mini (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPad3,1"])      return @"iPad 3 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad3,2"])      return @"iPad 3 (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPad3,3"])      return @"iPad 3";
+    if ([deviceString isEqualToString:@"iPad3,4"])      return @"iPad 4 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad3,5"])      return @"iPad 4";
+    if ([deviceString isEqualToString:@"iPad3,6"])      return @"iPad 4 (GSM+CDMA)";
+    if ([deviceString isEqualToString:@"iPad4,1"])      return @"iPad Air (WiFi)";
+    if ([deviceString isEqualToString:@"iPad4,2"])      return @"iPad Air (Cellular)";
+    if ([deviceString isEqualToString:@"iPad4,4"])      return @"iPad Mini 2 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad4,5"])      return @"iPad Mini 2 (Cellular)";
+    if ([deviceString isEqualToString:@"iPad4,6"])      return @"iPad Mini 2";
+    if ([deviceString isEqualToString:@"iPad4,7"])      return @"iPad Mini 3";
+    if ([deviceString isEqualToString:@"iPad4,8"])      return @"iPad Mini 3";
+    if ([deviceString isEqualToString:@"iPad4,9"])      return @"iPad Mini 3";
+    if ([deviceString isEqualToString:@"iPad5,1"])      return @"iPad Mini 4 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad5,2"])      return @"iPad Mini 4 (LTE)";
+    if ([deviceString isEqualToString:@"iPad5,3"])      return @"iPad Air 2";
+    if ([deviceString isEqualToString:@"iPad5,4"])      return @"iPad Air 2";
+    if ([deviceString isEqualToString:@"iPad6,3"])      return @"iPad Pro 9.7";
+    if ([deviceString isEqualToString:@"iPad6,4"])      return @"iPad Pro 9.7";
+    if ([deviceString isEqualToString:@"iPad6,7"])      return @"iPad Pro 12.9";
+    if ([deviceString isEqualToString:@"iPad6,8"])      return @"iPad Pro 12.9";
+    if ([deviceString isEqualToString:@"iPad6,11"])    return @"iPad 5 (WiFi)";
+    if ([deviceString isEqualToString:@"iPad6,12"])    return @"iPad 5 (Cellular)";
+    if ([deviceString isEqualToString:@"iPad7,1"])     return @"iPad Pro 12.9 inch 2nd gen (WiFi)";
+    if ([deviceString isEqualToString:@"iPad7,2"])     return @"iPad Pro 12.9 inch 2nd gen (Cellular)";
+    if ([deviceString isEqualToString:@"iPad7,3"])     return @"iPad Pro 10.5 inch (WiFi)";
+    if ([deviceString isEqualToString:@"iPad7,4"])     return @"iPad Pro 10.5 inch (Cellular)";
+    
+    if ([deviceString isEqualToString:@"AppleTV2,1"])    return @"Apple TV 2";
+    if ([deviceString isEqualToString:@"AppleTV3,1"])    return @"Apple TV 3";
+    if ([deviceString isEqualToString:@"AppleTV3,2"])    return @"Apple TV 3";
+    if ([deviceString isEqualToString:@"AppleTV5,3"])    return @"Apple TV 4";
+    
+    if ([deviceString isEqualToString:@"i386"])         return @"Simulator";
+    if ([deviceString isEqualToString:@"x86_64"])       return @"Simulator";
+    
+    return deviceString;
 }
 
     // ---------------------------------------------------------------------------------------

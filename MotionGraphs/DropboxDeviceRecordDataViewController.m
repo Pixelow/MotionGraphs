@@ -68,7 +68,9 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    self.dropboxDeviceRecordListStringToSend = [NSString stringWithFormat:@"/%@/%@",self.rowIndexPathFromDropboxDeviceRecordDataDayViewController, [self.dropboxDeviceRecordRootList.reverseObjectEnumerator.allObjects objectAtIndex:indexPath.row]];
+//    self.dropboxDeviceRecordListStringToSend = [NSString stringWithFormat:@"/%@/%@",self.rowIndexPathFromDropboxDeviceRecordDataDayViewController, [self.dropboxDeviceRecordRootList.reverseObjectEnumerator.allObjects objectAtIndex:indexPath.row]];
+    
+    
     
     // ----------------- Check if internet connection is Available. If YES then only perform seque -----------------------------
     [self isNetworkAvailable];
@@ -110,7 +112,6 @@
     }
     
     // Configure the cell
-    
     cell.textLabel.text = [NSString stringWithFormat:@"%@",[self.dropboxDeviceRecordRootList.reverseObjectEnumerator.allObjects objectAtIndex:indexPath.row]];
     return cell;
 }
@@ -142,15 +143,30 @@
             } else {
                 
                 // Do not perform seque instead present the information in alert view
-                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@"Please download from the iCloud Drive App first." preferredStyle:UIAlertControllerStyleAlert];
-                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
-                [alertController addAction:ok];
-                UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-                [vc presentViewController:alertController animated:YES completion:nil];
-                
-            }
-            
+//                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Notice" message:@"Please download from the iCloud Drive App first." preferredStyle:UIAlertControllerStyleAlert];
+//                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil];
+//                [alertController addAction:ok];
+//                UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+//                [vc presentViewController:alertController animated:YES completion:nil];
 
+                NSURL *correctUrl = [[self.recordedDataContentsUrl[cellPath.row] URLByDeletingLastPathComponent] URLByAppendingPathComponent:[self.dropboxDeviceRecordRootList.reverseObjectEnumerator.allObjects objectAtIndex:cellPath.row]];
+                
+                NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                [fileCoordinator coordinateReadingItemAtURL:correctUrl
+                                                    options:NSFileCoordinatorReadingWithoutChanges
+                                                      error:nil
+                                                 byAccessor:^(NSURL * _Nonnull newURL)
+                {
+                    NSString *contStr = [NSString stringWithContentsOfURL:newURL encoding:NSUTF8StringEncoding error:nil];
+                    
+                    self.recordedDataContent = [[NSString alloc] initWithString:contStr];
+                    
+                    UITableViewCell *theCell = [self.dropboxDeviceRecordView cellForRowAtIndexPath:cellPath];
+                    asdvc.navigationItem.title = theCell.textLabel.text;
+                    asdvc.appRecordData = self.recordedDataContent;
+                    asdvc.fileNameToPass = self.dropboxDeviceRecordListStringToSend;
+                }];
+            }
         }
     }
 }
@@ -178,7 +194,6 @@
 {
     return NO;
 }
-
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -209,11 +224,7 @@
         NSMetadataItem *item = obj;
         NSURL *url = [item valueForAttribute:NSMetadataItemURLKey];
         NSString *fileName = [item valueForAttribute:NSMetadataItemFSNameKey];
-        //        NSString *path = [item valueForAttribute:NSMetadataItemPathKey];
-        //        NSString *contentType = [item valueForAttribute:NSMetadataItemContentTypeKey];
-        //        NSString *displayName = [item valueForAttribute:NSMetadataItemDisplayNameKey];
-        //        [self.iCloudDriveFileContents addObject:url];
-        
+//        NSString *path = [item valueForAttribute:NSMetadataItemPathKey];
         [self.recordedDataContentsUrl addObject:url];
         [self createRootArray:url fileName:fileName];
     }];

@@ -1,0 +1,38 @@
+PODS:
+  - AVOSCloud (11.0.0)
+  - AVOSCloudIM (11.0.0):
+    - AVOSCloud (= 11.0.0)
+    - AVOSCloudIM/_ARC (= 11.0.0)
+    - AVOSCloudIM/_NOARC (= 11.0.0)
+  - AVOSCloudIM/_ARC (11.0.0):
+    - AVOSCloud (= 11.0.0)
+    - AVOSCloudIM/_NOARC (= 11.0.0)
+  - AVOSCloudIM/_NOARC (11.0.0):
+    - AVOSCloud (= 11.0.0)
+  - AVOSCloudLiveQuery (11.0.0):
+    - AVOSCloud (= 11.0.0)
+    - AVOSCloudIM (= 11.0.0)
+  - CorePlot (2.2)
+
+DEPENDENCIES:
+  - AVOSCloud
+  - AVOSCloudIM
+  - AVOSCloudLiveQuery
+  - CorePlot (~> 2.2)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AVOSCloud
+    - AVOSCloudIM
+    - AVOSCloudLiveQuery
+    - CorePlot
+
+SPEC CHECKSUMS:
+  AVOSCloud: 8ffa848f5f7391fc7594d3671a29cd6f8a14cc2a
+  AVOSCloudIM: 465af27feb394e50e1b09a7fd2da4645be340cdb
+  AVOSCloudLiveQuery: 1bf56cc6de04c2782ec9667bb96479db39c3de59
+  CorePlot: cbe0c6e14220705e32e06a89c7d6a5a908b7d7d8
+
+PODFILE CHECKSUM: f8dcf48157c0f32281235b4132301117259671e1
+
+COCOAPODS: 1.5.3
